@@ -1,7 +1,7 @@
-extern crate reqwest;
-
-use failure::Error;
+use failure::{bail, Error};
+use reqwest::{self, Client, StatusCode};
 use serde::{Deserialize, Serialize};
+use serde_json;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DNSRecord {
@@ -10,12 +10,8 @@ pub struct DNSRecord {
     dns_type: String,
     ttl: u32,
     priority: Option<String>,
-    weight: Option<String>,
-    port: Option<String>,
-    flag: Option<String>,
-    tag: Option<String>,
     id: String,
-    site_id: String,
+    site_id: Option<String>,
     dns_zone_id: String,
     value: String,
 }
