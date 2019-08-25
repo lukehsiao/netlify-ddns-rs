@@ -13,6 +13,8 @@ license = "MIT"
 
 [dependencies]
 clap = "2.33.0"
+reqwest = "0.9.20"
+failure = "0.1.5"
 
 [profile.release]
 lto = true

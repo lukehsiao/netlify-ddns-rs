@@ -5,7 +5,9 @@ use std::process;
 
 use clap::{App, AppSettings, Arg};
 
-fn parse_args() -> netlify_ddns::Args {
+use netlify_ddns::{run, Args, IpType};
+
+fn parse_args() -> Args {
     // Setup CLI
     let matches = App::new(crate_name!())
         .author(crate_authors!("\n"))
@@ -50,13 +52,17 @@ fn parse_args() -> netlify_ddns::Args {
     // TODO: could switch to structopt or clap v3
     let domain = matches.value_of("domain").unwrap().to_string();
     let subdomain = matches.value_of("subdomain").unwrap().to_string();
-    let ipv6 = matches.is_present("ipv6");
+    let ip_type = if matches.is_present("ipv6") {
+        IpType::IPV6
+    } else {
+        IpType::IPV4
+    };
     let token = matches.value_of("token").unwrap().to_string();
 
-    netlify_ddns::Args {
+    Args {
         domain,
         subdomain,
-        ipv6,
+        ip_type,
         token,
     }
 }
@@ -64,7 +70,7 @@ fn parse_args() -> netlify_ddns::Args {
 fn main() -> Result<(), ()> {
     let args = parse_args();
 
-    if let Err(e) = netlify_ddns::run(args) {
+    if let Err(e) = run(args) {
         eprintln!("Error: {}", e);
         process::exit(1);
     }
