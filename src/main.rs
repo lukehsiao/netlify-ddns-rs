@@ -17,10 +17,8 @@ fn parse_args() -> Args {
             Arg::with_name("token")
                 .short("t")
                 .long("token")
-                .value_name("TOKEN")
                 .help("Your Netlify personal access token")
-                .required(true)
-                .takes_value(true),
+                .env("NETLIFY_TOKEN"),
         )
         .arg(
             Arg::with_name("subdomain")
@@ -28,7 +26,6 @@ fn parse_args() -> Args {
                 .long("subdomain")
                 .help("The subdomain segment for the DNS record")
                 .default_value("www")
-                .value_name("SUBDOMAIN")
                 .takes_value(true),
         )
         .arg(
@@ -37,7 +34,6 @@ fn parse_args() -> Args {
                 .long("domain")
                 .help("The full domain for the DNS record")
                 .required(true)
-                .value_name("DOMAIN")
                 .takes_value(true),
         )
         .arg(
