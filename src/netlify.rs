@@ -1,19 +1,16 @@
 use failure::{bail, Error};
 use reqwest::{self, Client, StatusCode};
 use serde::{Deserialize, Serialize};
-use serde_json;
+use serde_json::{self, json};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DNSRecord {
-    hostname: String,
+    pub hostname: String,
     #[serde(rename = "type")]
-    dns_type: String,
-    ttl: u32,
-    priority: Option<String>,
-    id: String,
-    site_id: Option<String>,
-    dns_zone_id: String,
-    value: String,
+    pub dns_type: String,
+    pub ttl: Option<u32>,
+    pub id: Option<String>,
+    pub value: String,
 }
 
 /// Retrieve the DNS records for domain, authenticated with token.
@@ -23,6 +20,7 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Erro
         domain.replace(".", "_"),
         token
     );
+
     #[cfg(test)]
     let mut res = reqwest::get(&mockito::server_url())?;
 
@@ -32,6 +30,54 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Erro
     let dns_records: Vec<DNSRecord> = res.json()?;
 
     Ok(dns_records)
+}
+
+/// Delete the DNS record.
+pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<(), Error> {
+    let url = format!(
+        "https://api.netlify.com/api/v1/dns_zones/{}/dns_records/{}?access_token={}",
+        domain.replace(".", "_"),
+        record.id.expect("Record did not have an ID."),
+        token
+    );
+
+    let response = Client::new().delete(&url).send()?;
+    match response.status() {
+        StatusCode::NOT_FOUND => bail!("The domain {} could not be found on your account.", domain),
+        StatusCode::UNAUTHORIZED => bail!("Unauthorized credentials. Check your Netlify token"),
+        StatusCode::OK | StatusCode::NO_CONTENT => (),
+        status => bail!("Error {}: could not delete the dns record", status),
+    }
+
+    Ok(())
+}
+
+/// Add a dns record to the domain.
+pub fn add_dns_record(domain: &str, token: &str, record: &DNSRecord) -> Result<DNSRecord, Error> {
+    let url = format!(
+        "https://api.netlify.com/api/v1/dns_zones/{}/dns_records?access_token={}",
+        domain.replace(".", "_"),
+        token
+    );
+
+    let rec = json!({
+        "type": record.dns_type,
+        "hostname": record.hostname,
+        "value": record.value,
+    });
+
+    let req = Client::new().post(&url).json(&rec);
+
+    let mut response = req.send()?;
+
+    let result = match response.status() {
+        StatusCode::CREATED => response.json::<DNSRecord>()?,
+        StatusCode::NOT_FOUND => bail!("The domain {} could not be found on your account.", domain),
+        StatusCode::UNAUTHORIZED => bail!("Unauthorized credentials. Check your Netlify token"),
+        status => bail!("Error {}: could not add the dns record", status),
+    };
+
+    Ok(result)
 }
 
 #[cfg(test)]

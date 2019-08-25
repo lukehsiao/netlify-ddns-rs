@@ -20,14 +20,14 @@ pub struct Args {
     pub token: String,
 }
 
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum IpType {
     IPV4,
     IPV6,
 }
 
 // Get the host machine's external IP address
-fn get_external_ip(ip_type: IpType) -> Result<String, Error> {
+fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
     #[cfg(test)]
     let mut res = match ip_type {
         IpType::IPV4 => reqwest::get(&mockito::server_url())?,
@@ -44,9 +44,45 @@ fn get_external_ip(ip_type: IpType) -> Result<String, Error> {
 }
 
 pub fn run(args: Args) -> Result<(), Error> {
-    let _ip = get_external_ip(args.ip_type)?;
+    let ip = get_external_ip(&args.ip_type)?;
 
+    let rec = DNSRecord {
+        hostname: format!("{}.{}", &args.subdomain, &args.domain),
+        dns_type: match args.ip_type {
+            IpType::IPV4 => "A".to_string(),
+            IpType::IPV6 => "AAAA".to_string(),
+        },
+        ttl: Some(3600),
+        value: ip,
+        id: None,
+    };
+
+    // Update the DNS record if it exists, otherwise add.
     let dns_records = netlify::get_dns_records(&args.domain, &args.token)?;
+
+    // Match on subdomain
+    // TODO: what if subdomain == ""?
+    let (exact, conflicts): (Vec<DNSRecord>, Vec<DNSRecord>) = dns_records
+        .into_iter()
+        .filter(|r| match &args.ip_type {
+            IpType::IPV4 => r.dns_type == "A",
+            IpType::IPV6 => r.dns_type == "AAAA",
+        })
+        .filter(|r| {
+            let v = r.hostname.split('.').collect::<Vec<&str>>();
+            v.len() == 3 && v[0] == &args.subdomain
+        })
+        .partition(|r| r.hostname == rec.hostname && r.value == rec.value);
+
+    // Clear existing records for this subdomain, if any
+    for r in conflicts {
+        netlify::delete_dns_record(&args.domain, &args.token, r)?;
+    }
+
+    // Add new record
+    if exact.len() == 0 {
+        netlify::add_dns_record(&args.domain, &args.token, &rec)?;
+    }
 
     Ok(())
 }
@@ -63,7 +99,7 @@ mod test {
             .with_header("content-type", "text/plain")
             .with_body("104.132.34.103")
             .create();
-        let ip = get_external_ip(IpType::IPV4).unwrap();
+        let ip = get_external_ip(&IpType::IPV4).unwrap();
         assert_eq!("104.132.34.103", &ip);
 
         let _m = mock("GET", "/")
@@ -72,7 +108,7 @@ mod test {
             .with_body("2620:0:1003:fd00:95e9:369a:53cd:f035")
             .create();
 
-        let ip = get_external_ip(IpType::IPV6).unwrap();
+        let ip = get_external_ip(&IpType::IPV6).unwrap();
         assert_eq!("2620:0:1003:fd00:95e9:369a:53cd:f035", &ip);
     }
 }
