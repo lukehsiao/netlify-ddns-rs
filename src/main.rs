@@ -1,13 +1,14 @@
 #[macro_use]
 extern crate clap;
-
-use std::process;
+#[macro_use]
+extern crate failure;
 
 use clap::{App, AppSettings, Arg};
+use failure::Error;
 
 use netlify_ddns::{run, Args, IpType};
 
-fn parse_args() -> Args {
+fn parse_args() -> Result<Args, Error> {
     // Setup CLI
     let matches = App::new(crate_name!())
         .author(crate_authors!("\n"))
@@ -53,23 +54,28 @@ fn parse_args() -> Args {
     } else {
         IpType::IPV4
     };
-    let token = matches.value_of("token").unwrap().to_string();
 
-    Args {
+    if !matches.is_present("token") {
+        bail!("No Netlify personal access token found.");
+    }
+    let token = matches
+        .value_of("token")
+        .expect("No Netlify Token found.")
+        .to_string();
+
+    Ok(Args {
         domain,
         subdomain,
         ip_type,
         token,
-    }
+    })
 }
 
-fn main() -> Result<(), ()> {
-    let args = parse_args();
+fn main() -> Result<(), Error> {
+    let args = match parse_args() {
+        Ok(args) => args,
+        Err(e) => return Err(e),
+    };
 
-    if let Err(e) = run(args) {
-        eprintln!("Error: {}", e);
-        process::exit(1);
-    }
-
-    Ok(())
+    return run(args);
 }
