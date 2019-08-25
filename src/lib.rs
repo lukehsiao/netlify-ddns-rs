@@ -1,9 +1,13 @@
 extern crate failure;
 extern crate reqwest;
 
+pub mod netlify;
+
 use std::io::Read;
 
 use failure::Error;
+
+use netlify::DNSRecord;
 
 #[cfg(test)]
 use mockito;
@@ -41,6 +45,9 @@ fn get_external_ip(ip_type: IpType) -> Result<String, Error> {
 
 pub fn run(args: Args) -> Result<(), Error> {
     let _ip = get_external_ip(args.ip_type)?;
+
+    let dns_records = netlify::get_dns_records(&args.domain, &args.token)?;
+
     Ok(())
 }
 

@@ -16,6 +16,7 @@ clap = "2.33.0"
 reqwest = "0.9.20"
 failure = "0.1.5"
 mockito = "0.20.0"
+serde = "1.0.99"
 
 [profile.release]
 lto = true

@@ -55,13 +55,10 @@ fn parse_args() -> Result<Args, Error> {
         IpType::IPV4
     };
 
-    if !matches.is_present("token") {
-        bail!("No Netlify personal access token found.");
-    }
-    let token = matches
-        .value_of("token")
-        .expect("No Netlify Token found.")
-        .to_string();
+    let token = match matches.value_of("token") {
+        Some(token) => token.to_string(),
+        None => bail!("No Netlify personal access token found."),
+    };
 
     Ok(Args {
         domain,
