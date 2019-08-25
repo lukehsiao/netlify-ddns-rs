@@ -31,7 +31,7 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Erro
     let mut res = reqwest::get(&mockito::server_url())?;
 
     #[cfg(not(test))]
-    let mut res = reqwest::get(url.as_str())?;
+    let mut res = reqwest::get(&url)?;
 
     let dns_records: Vec<DNSRecord> = res.json()?;
 

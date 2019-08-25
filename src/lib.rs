@@ -64,7 +64,7 @@ mod test {
             .with_body("104.132.34.103")
             .create();
         let ip = get_external_ip(IpType::IPV4).unwrap();
-        assert_eq!("104.132.34.103", ip.as_str());
+        assert_eq!("104.132.34.103", &ip);
 
         let _m = mock("GET", "/")
             .with_status(200)
@@ -73,6 +73,6 @@ mod test {
             .create();
 
         let ip = get_external_ip(IpType::IPV6).unwrap();
-        assert_eq!("2620:0:1003:fd00:95e9:369a:53cd:f035", ip.as_str());
+        assert_eq!("2620:0:1003:fd00:95e9:369a:53cd:f035", &ip);
     }
 }
