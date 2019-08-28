@@ -7,7 +7,7 @@ publish = false
 description = "A simple CLI tool for setting Netlify DNS records."
 repository = "https://github.com/lukehsiao/netlify-ddns-rs"
 readme = "README.md"
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
