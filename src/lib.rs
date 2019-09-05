@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate failure;
 extern crate reqwest;
 
@@ -28,18 +29,34 @@ pub enum IpType {
 
 // Get the host machine's external IP address
 fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
+    let mut body = String::new();
+
     #[cfg(test)]
-    let mut res = match ip_type {
+    let mut resp = match ip_type {
         IpType::IPV4 => reqwest::get(&mockito::server_url())?,
         IpType::IPV6 => reqwest::get(&mockito::server_url())?,
     };
     #[cfg(not(test))]
-    let mut res = match ip_type {
+    let mut resp = match ip_type {
         IpType::IPV4 => reqwest::get("https://v4.ident.me/")?,
         IpType::IPV6 => reqwest::get("https://v6.ident.me/")?,
     };
-    let mut body = String::new();
-    res.read_to_string(&mut body)?;
+
+    if resp.status().is_success() {
+        resp.read_to_string(&mut body)?;
+    } else {
+        // Attempt a fallback service
+        resp = match ip_type {
+            IpType::IPV4 => reqwest::get("https://api.ipify.org/")?,
+            IpType::IPV6 => reqwest::get("https://api6.ipify.org/")?,
+        };
+
+        if resp.status().is_success() {
+            resp.read_to_string(&mut body)?;
+        } else {
+            bail!("Unable to get external IP.");
+        }
+    }
     Ok(body)
 }
 
