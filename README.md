@@ -1,8 +1,8 @@
 # netlify-ddns
 
-![Travis-CI](https://img.shields.io/travis/com/lukehsiao/netlify-ddns-rs)
-![Crates.io](https://img.shields.io/crates/v/netlify-ddns)
-![License](https://img.shields.io/crates/l/netlify-ddns)
+[![Travis-CI](https://img.shields.io/travis/com/lukehsiao/netlify-ddns-rs)](https://travis-ci.com/lukehsiao/netlify-ddns-rs)
+[![Crates.io](https://img.shields.io/crates/v/netlify-ddns)](https://crates.io/crates/netlify-ddns)
+[![License](https://img.shields.io/crates/l/netlify-ddns)](https://github.com/lukehsiao/netlify-ddns-rs/blob/master/LICENSE-MIT)
 
 netlify-ddns is a simple command line tool for creating a DNS record for
 [Netlify's Managed DNS][netlify] service. It is meant to be run as a cron job
