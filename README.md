@@ -20,19 +20,20 @@ cargo install netlify-ddns
 ## Usage
 
 ```
-netlify-ddns
+netlify-ddns 0.2.0
 A simple CLI tool for setting Netlify DNS records.
 
 USAGE:
-    netlify-ddns [FLAGS] [OPTIONS] --domain <domain>
+    netlify-ddns [OPTIONS] --domain <domain> --token <token>
 
 FLAGS:
     -h, --help       Prints help information
-        --ipv6       Whether an IPv6 'AAAA' record should be updated
     -V, --version    Prints version information
 
 OPTIONS:
     -d, --domain <domain>          The full domain for the DNS record
+    -i, --ip-type <ip-type>        Whether an IPv6 'AAAA' record should be updated [default: ipv4]  [possible
+                                   values: IPV4, IPV6]
     -s, --subdomain <subdomain>    The subdomain segment for the DNS record [default: www]
     -t, --token <token>            Your Netlify personal access token [env: NETLIFY_TOKEN=]
 ```

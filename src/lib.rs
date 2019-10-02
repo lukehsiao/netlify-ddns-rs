@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate log;
 extern crate reqwest;
 
 pub mod netlify;
@@ -7,24 +9,45 @@ pub mod netlify;
 use std::io::Read;
 
 use failure::Error;
+use structopt::clap::arg_enum;
+use structopt::clap::AppSettings;
+use structopt::StructOpt;
 
 use netlify::DNSRecord;
 
 #[cfg(test)]
 use mockito;
 
-#[derive(Debug)]
-pub struct Args {
-    pub domain: String,
-    pub subdomain: String,
-    pub ip_type: IpType,
-    pub token: String,
+arg_enum! {
+    #[derive(Debug)]
+    pub enum IpType {
+        IPV4,
+        IPV6,
+    }
 }
 
-#[derive(PartialEq, Debug)]
-pub enum IpType {
-    IPV4,
-    IPV6,
+#[derive(Debug, StructOpt)]
+#[structopt(
+    about,
+    setting(AppSettings::ColoredHelp),
+    setting(AppSettings::ColorAuto)
+)]
+pub struct Args {
+    /// The full domain for the DNS record
+    #[structopt(short, long)]
+    pub domain: String,
+
+    /// The subdomain segment for the DNS record
+    #[structopt(short, long, default_value = "www")]
+    pub subdomain: String,
+
+    /// Whether an IPv6 'AAAA' record should be updated
+    #[structopt(short, long, possible_values = &IpType::variants(), case_insensitive = true, default_value = "ipv4")]
+    pub ip_type: IpType,
+
+    /// Your Netlify personal access token
+    #[structopt(short, long, env = "NETLIFY_TOKEN")]
+    pub token: String,
 }
 
 // Get the host machine's external IP address
@@ -42,9 +65,11 @@ fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
         IpType::IPV6 => reqwest::get("https://v6.ident.me/")?,
     };
 
+    debug!("Querying ident.me for external IP...");
     if resp.status().is_success() {
         resp.read_to_string(&mut body)?;
     } else {
+        warn!("ident.me query failed. Trying ipify.org...");
         // Attempt a fallback service
         resp = match ip_type {
             IpType::IPV4 => reqwest::get("https://api.ipify.org/")?,
@@ -81,7 +106,7 @@ pub fn run(args: Args) -> Result<(), Error> {
     // TODO: what if subdomain == ""?
     let (exact, conflicts): (Vec<DNSRecord>, Vec<DNSRecord>) = dns_records
         .into_iter()
-        .filter(|r| match &args.ip_type {
+        .filter(|r| match args.ip_type {
             IpType::IPV4 => r.dns_type == "A",
             IpType::IPV6 => r.dns_type == "AAAA",
         })
@@ -93,6 +118,7 @@ pub fn run(args: Args) -> Result<(), Error> {
 
     // Clear existing records for this subdomain, if any
     for r in conflicts {
+        debug!("Clearing conflicting DNS records for this subdomain.");
         netlify::delete_dns_record(&args.domain, &args.token, r)?;
     }
 
