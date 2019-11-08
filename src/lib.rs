@@ -7,6 +7,8 @@ extern crate reqwest;
 pub mod netlify;
 
 use std::io::Read;
+use futures::{executor, future};
+use futures::future::FutureExt;
 
 use failure::Error;
 use structopt::clap::arg_enum;
@@ -50,8 +52,7 @@ pub struct Args {
     pub token: String,
 }
 
-// Get the host machine's external IP address
-fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
+async fn query_ident_me(ip_type: &IpType) -> Result<String, Error> {
     let mut body = String::new();
 
     #[cfg(test)]
@@ -65,28 +66,53 @@ fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
         IpType::IPV6 => reqwest::get("https://v6.ident.me/")?,
     };
 
-    debug!("Querying ident.me for external IP...");
     if resp.status().is_success() {
         resp.read_to_string(&mut body)?;
     } else {
-        warn!("ident.me query failed. Trying ipify.org...");
-        // Attempt a fallback service
-        resp = match ip_type {
-            IpType::IPV4 => reqwest::get("https://api.ipify.org/")?,
-            IpType::IPV6 => reqwest::get("https://api6.ipify.org/")?,
-        };
-
-        if resp.status().is_success() {
-            resp.read_to_string(&mut body)?;
-        } else {
-            bail!("Unable to get external IP.");
-        }
+        bail!("Unable to get external IP from ident.me.");
     }
+
     Ok(body)
 }
 
+async fn query_ipify_org(ip_type: &IpType) -> Result<String, Error> {
+    let mut body = String::new();
+
+    #[cfg(test)]
+    let mut resp = match ip_type {
+        IpType::IPV4 => reqwest::get(&mockito::server_url())?,
+        IpType::IPV6 => reqwest::get(&mockito::server_url())?,
+    };
+    #[cfg(not(test))]
+    let mut resp = match ip_type {
+        IpType::IPV4 => reqwest::get("https://api.ipify.org/")?,
+        IpType::IPV6 => reqwest::get("https://api6.ipify.org/")?,
+    };
+
+    if resp.status().is_success() {
+        resp.read_to_string(&mut body)?;
+    } else {
+        bail!("Unable to get external IP from ipify.org.");
+    }
+
+    Ok(body)
+}
+
+// Get the host machine's external IP address by querying multiple services and
+// taking the first response.
+async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
+    debug!("Querying third-party services for external IP...");
+
+    let third_parties = vec![query_ident_me(ip_type).boxed(), query_ipify_org(ip_type).boxed()];
+
+    // Select the first succesful future, or the last failure.
+    let (ip, _) = future::select_ok(third_parties.into_iter()).await?;
+
+    Ok(ip)
+}
+
 pub fn run(args: Args) -> Result<(), Error> {
-    let ip = get_external_ip(&args.ip_type)?;
+    let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
     let rec = DNSRecord {
         hostname: format!("{}.{}", &args.subdomain, &args.domain),
@@ -142,7 +168,7 @@ mod test {
             .with_header("content-type", "text/plain")
             .with_body("104.132.34.103")
             .create();
-        let ip = get_external_ip(&IpType::IPV4).unwrap();
+        let ip = executor::block_on(get_external_ip(&IpType::IPV4)).unwrap();
         assert_eq!("104.132.34.103", &ip);
 
         let _m = mock("GET", "/")
@@ -151,7 +177,20 @@ mod test {
             .with_body("2620:0:1003:fd00:95e9:369a:53cd:f035")
             .create();
 
-        let ip = get_external_ip(&IpType::IPV6).unwrap();
+        let ip = executor::block_on(get_external_ip(&IpType::IPV6)).unwrap();
         assert_eq!("2620:0:1003:fd00:95e9:369a:53cd:f035", &ip);
+    }
+
+    #[test]
+    fn test_get_external_ip_404() {
+        let _m = mock("GET", "/")
+            .with_status(404)
+            .with_header("content-type", "text/plain")
+            .with_body("Not found")
+            .create();
+
+        if let Ok(_) = block_on(get_external_ip(&IpType::IPV6)) {
+            panic!("Should've gotten an error.");
+        }
     }
 }

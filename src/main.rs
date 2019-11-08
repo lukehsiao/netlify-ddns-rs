@@ -8,5 +8,5 @@ fn main() -> Result<(), Error> {
     pretty_env_logger::init_timed();
     let args = Args::from_args();
 
-    return run(args);
+    run(args)
 }
