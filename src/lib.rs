@@ -108,6 +108,7 @@ async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
     // Select the first succesful future, or the last failure.
     let (ip, _) = future::select_ok(third_parties.into_iter()).await?;
 
+    info!("Found External IP: {}", ip);
     Ok(ip)
 }
 
@@ -144,12 +145,13 @@ pub fn run(args: Args) -> Result<(), Error> {
 
     // Clear existing records for this subdomain, if any
     for r in conflicts {
-        debug!("Clearing conflicting DNS records for this subdomain.");
+        info!("Clearing conflicting DNS records for this subdomain.");
         netlify::delete_dns_record(&args.domain, &args.token, r)?;
     }
 
     // Add new record
     if exact.len() == 0 {
+        info!("Adding the DNS record.");
         netlify::add_dns_record(&args.domain, &args.token, &rec)?;
     }
 
