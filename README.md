@@ -20,8 +20,8 @@ cargo install netlify-ddns
 ## Usage
 
 ```
-netlify-ddns 0.2.0
-A simple CLI tool for setting Netlify DNS records.
+netlify-ddns 0.2.1
+A simple CLI tool for setting Netlify DNS records dynamically.
 
 USAGE:
     netlify-ddns [OPTIONS] --domain <domain> --token <token>
