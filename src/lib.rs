@@ -194,7 +194,7 @@ mod test {
             .with_body("Not found")
             .create();
 
-        if let Ok(_) = block_on(get_external_ip(&IpType::IPV6)) {
+        if let Ok(_) = executor::block_on(get_external_ip(&IpType::IPV6)) {
             panic!("Should've gotten an error.");
         }
     }
