@@ -6,9 +6,9 @@ extern crate reqwest;
 
 pub mod netlify;
 
-use std::io::Read;
-use futures::{executor, future};
 use futures::future::FutureExt;
+use futures::{executor, future};
+use std::io::Read;
 
 use failure::Error;
 use structopt::clap::arg_enum;
@@ -103,7 +103,10 @@ async fn query_ipify_org(ip_type: &IpType) -> Result<String, Error> {
 async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
     debug!("Querying third-party services for external IP...");
 
-    let third_parties = vec![query_ident_me(ip_type).boxed(), query_ipify_org(ip_type).boxed()];
+    let third_parties = vec![
+        query_ident_me(ip_type).boxed(),
+        query_ipify_org(ip_type).boxed(),
+    ];
 
     // Select the first succesful future, or the last failure.
     let (ip, _) = future::select_ok(third_parties.into_iter()).await?;
@@ -139,7 +142,7 @@ pub fn run(args: Args) -> Result<(), Error> {
         })
         .filter(|r| {
             let v = r.hostname.split('.').collect::<Vec<&str>>();
-            v.len() == 3 && v[0] == &args.subdomain
+            v.len() == 3 && v[0] == args.subdomain
         })
         .partition(|r| r.hostname == rec.hostname && r.value == rec.value);
 
@@ -150,7 +153,7 @@ pub fn run(args: Args) -> Result<(), Error> {
     }
 
     // Add new record
-    if exact.len() == 0 {
+    if exact.is_empty() {
         info!("Adding the DNS record.");
         netlify::add_dns_record(&args.domain, &args.token, &rec)?;
     }
