@@ -20,7 +20,7 @@ cargo install netlify-ddns
 ## Usage
 
 ```
-netlify-ddns 0.2.1
+netlify-ddns
 A simple CLI tool for setting Netlify DNS records dynamically.
 
 USAGE:
