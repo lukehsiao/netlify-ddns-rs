@@ -1,6 +1,6 @@
 [package]
 name = "netlify-ddns"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Luke Hsiao <lwhsiao@stanford.edu>"]
 edition = "2018"
 description = "A simple CLI tool for setting Netlify DNS records dynamically."
@@ -36,12 +36,14 @@ maintenance = { status = "passively-maintained" }
 failure = "0.1.6"
 futures = "0.3.1"
 log = "0.4.8"
-mockito = "0.22.0"
 pretty_env_logger = "0.3.1"
 reqwest = "0.9.24"
 serde = "1.0.104"
 serde_json = "1.0.44"
 structopt = "0.3.5"
+
+[dev-dependencies]
+mockito = "0.22.0"
 
 [profile.release]
 debug = false
