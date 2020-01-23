@@ -1,19 +1,13 @@
 #![forbid(unsafe_code)]
 #![forbid(warnings)]
 
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate log;
-extern crate reqwest;
-
 pub mod netlify;
 
 use futures::future::FutureExt;
 use futures::{executor, future};
-use std::io::Read;
 
-use failure::Error;
+use failure::{bail, Error};
+use log::{debug, info};
 use structopt::clap::arg_enum;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
@@ -56,49 +50,43 @@ pub struct Args {
 }
 
 async fn query_ident_me(ip_type: &IpType) -> Result<String, Error> {
-    let mut body = String::new();
-
     #[cfg(test)]
-    let mut resp = match ip_type {
-        IpType::IPV4 => reqwest::get(&mockito::server_url())?,
-        IpType::IPV6 => reqwest::get(&mockito::server_url())?,
+    let resp = match ip_type {
+        IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
+        IpType::IPV6 => ureq::get(&mockito::server_url()).call(),
     };
     #[cfg(not(test))]
-    let mut resp = match ip_type {
-        IpType::IPV4 => reqwest::get("https://v4.ident.me/")?,
-        IpType::IPV6 => reqwest::get("https://v6.ident.me/")?,
+    let resp = match ip_type {
+        IpType::IPV4 => ureq::get("https://v4.ident.me/").call(),
+        IpType::IPV6 => ureq::get("https://v6.ident.me/").call(),
     };
 
-    if resp.status().is_success() {
-        resp.read_to_string(&mut body)?;
+    if resp.ok() {
+        let body = resp.into_string()?;
+        Ok(body)
     } else {
         bail!("Unable to get external IP from ident.me.");
     }
-
-    Ok(body)
 }
 
 async fn query_ipify_org(ip_type: &IpType) -> Result<String, Error> {
-    let mut body = String::new();
-
     #[cfg(test)]
-    let mut resp = match ip_type {
-        IpType::IPV4 => reqwest::get(&mockito::server_url())?,
-        IpType::IPV6 => reqwest::get(&mockito::server_url())?,
+    let resp = match ip_type {
+        IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
+        IpType::IPV6 => ureq::get(&mockito::server_url()).call(),
     };
     #[cfg(not(test))]
-    let mut resp = match ip_type {
-        IpType::IPV4 => reqwest::get("https://api.ipify.org/")?,
-        IpType::IPV6 => reqwest::get("https://api6.ipify.org/")?,
+    let resp = match ip_type {
+        IpType::IPV4 => ureq::get("https://api.ipify.org/").call(),
+        IpType::IPV6 => ureq::get("https://api6.ipify.org/").call(),
     };
 
-    if resp.status().is_success() {
-        resp.read_to_string(&mut body)?;
+    if resp.ok() {
+        let body = resp.into_string()?;
+        Ok(body)
     } else {
         bail!("Unable to get external IP from ipify.org.");
     }
-
-    Ok(body)
 }
 
 // Get the host machine's external IP address by querying multiple services and
@@ -122,7 +110,7 @@ pub fn run(args: Args) -> Result<(), Error> {
     let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
     let rec = DNSRecord {
-        hostname: format!("{}.{}", &args.subdomain, &args.domain),
+        hostname: format!("{}", &args.subdomain),
         dns_type: match args.ip_type {
             IpType::IPV4 => "A".to_string(),
             IpType::IPV6 => "AAAA".to_string(),
@@ -158,7 +146,8 @@ pub fn run(args: Args) -> Result<(), Error> {
     // Add new record
     if exact.is_empty() {
         info!("Adding the DNS record.");
-        netlify::add_dns_record(&args.domain, &args.token, &rec)?;
+        let rec = netlify::add_dns_record(&args.domain, &args.token, &rec)?;
+        info!("{:#?}", rec);
     }
 
     Ok(())
