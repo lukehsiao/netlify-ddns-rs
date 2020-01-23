@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 use failure::Error;
 use pretty_env_logger;
 use structopt::StructOpt;
