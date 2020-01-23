@@ -15,16 +15,18 @@ pub struct DNSRecord {
 
 /// Retrieve the DNS records for domain, authenticated with token.
 pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Error> {
+    #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records?access_token={}",
         domain.replace(".", "_"),
         token
     );
-
     #[cfg(test)]
-    let mut res = reqwest::get(&mockito::server_url())?;
+    let url = {
+        let _ = (domain, token); // supress unused variable warning in test
+        mockito::server_url()
+    };
 
-    #[cfg(not(test))]
     let mut res = reqwest::get(&url)?;
 
     let dns_records: Vec<DNSRecord> = res.json()?;

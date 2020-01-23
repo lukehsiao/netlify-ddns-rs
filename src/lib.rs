@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![forbid(warnings)]
 
 #[macro_use]
 extern crate failure;

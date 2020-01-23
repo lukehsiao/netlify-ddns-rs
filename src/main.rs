@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![forbid(warnings)]
 
 use failure::Error;
 use pretty_env_logger;
