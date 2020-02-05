@@ -147,7 +147,7 @@ pub fn run(args: Args) -> Result<(), Error> {
     // Add new record
     if exact.is_empty() {
         info!("Adding the DNS record.");
-        let rec = netlify::add_dns_record(&args.domain, &args.token, &rec)?;
+        let rec = netlify::add_dns_record(&args.domain, &args.token, rec)?;
         info!("{:#?}", rec);
     }
 

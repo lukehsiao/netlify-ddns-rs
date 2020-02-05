@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - [@lukehsiao][lh]: Switch http library from reqwest to ureq.
+- [@lukehsiao][lh]: `netlify::add_dns_record()` now takes ownership of the
+  provided record.
 
 ### Fixed
 - [@lukehsiao][lh]: Moved mockito to correctly be a dev-dependency.

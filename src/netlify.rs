@@ -58,7 +58,7 @@ pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result
 }
 
 /// Add a dns record to the domain.
-pub fn add_dns_record(domain: &str, token: &str, record: &DNSRecord) -> Result<DNSRecord, Error> {
+pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DNSRecord, Error> {
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
         domain.replace(".", "_"),
