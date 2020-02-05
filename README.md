@@ -36,6 +36,7 @@ OPTIONS:
                                    values: IPV4, IPV6]
     -s, --subdomain <subdomain>    The subdomain segment for the DNS record [default: www]
     -t, --token <token>            Your Netlify personal access token [env: NETLIFY_TOKEN=]
+        --ttl <ttl>                The TTL value in seconds to set with the record [default: 3600]
 ```
 
 ## Related
