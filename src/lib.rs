@@ -14,9 +14,6 @@ use structopt::StructOpt;
 
 use netlify::DNSRecord;
 
-#[cfg(test)]
-use mockito;
-
 arg_enum! {
     #[derive(Debug)]
     pub enum IpType {
@@ -39,6 +36,10 @@ pub struct Args {
     /// The subdomain segment for the DNS record
     #[structopt(short, long, default_value = "www")]
     pub subdomain: String,
+
+    /// The TTL value in seconds to set with the record
+    #[structopt(long, default_value = "3600")]
+    pub ttl: u32,
 
     /// Whether an IPv6 'AAAA' record should be updated
     #[structopt(short, long, possible_values = &IpType::variants(), case_insensitive = true, default_value = "ipv4")]
@@ -115,7 +116,7 @@ pub fn run(args: Args) -> Result<(), Error> {
             IpType::IPV4 => "A".to_string(),
             IpType::IPV6 => "AAAA".to_string(),
         },
-        ttl: Some(3600),
+        ttl: Some(args.ttl),
         value: ip,
         id: None,
     };
