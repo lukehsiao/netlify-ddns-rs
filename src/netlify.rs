@@ -30,7 +30,11 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Erro
         let dns_records: Vec<DNSRecord> = serde_json::from_str(&resp.into_string()?)?;
         Ok(dns_records)
     } else {
-        bail!("Unable to get DNS records.");
+        bail!(
+            "[{}] ({}): Unable to get DNS records.",
+            resp.status(),
+            resp.status_text()
+        );
     }
 }
 
@@ -79,13 +83,14 @@ pub fn add_dns_record(domain: &str, token: &str, record: &DNSRecord) -> Result<D
 #[cfg(test)]
 mod test {
     use super::*;
-    use mockito::mock;
+    use mockito::{mock, Matcher};
 
     #[test]
     fn test_get_dns_records() {
         let body = "[{\"hostname\":\"www.example.com\",\"type\":\"NETLIFY\",\"ttl\":3600,\"priority\":null,\"weight\":null,\"port\":null,\"flag\":null,\"tag\":null,\"id\":\"5c3c343c50ab38c5d4b73003\",\"site_id\":\"d6e3d4f7-c8a5-44f3-90ab-2a4aa63ff52b\",\"dns_zone_id\":\"5c3c343b50ab38c5d4b73001\",\"errors\":[],\"managed\":true,\"value\":\"example.netlify.com\"},{\"hostname\":\"example.com\",\"type\":\"NETLIFY\",\"ttl\":3600,\"priority\":null,\"weight\":null,\"port\":null,\"flag\":null,\"tag\":null,\"id\":\"5c3c343d50ab38c5d4b73005\",\"site_id\":\"d6e3d4f7-c8a5-44f3-90ab-2a4aa63ff52b\",\"dns_zone_id\":\"5c3c343b50ab38c5d4b73001\",\"errors\":[],\"managed\":true,\"value\":\"example.netlify.com\"},{\"hostname\":\"www.example.com\",\"type\":\"NETLIFYv6\",\"ttl\":3600,\"priority\":null,\"weight\":null,\"port\":null,\"flag\":null,\"tag\":null,\"id\":\"5c3c3e41ccd232f0f0298fb9\",\"site_id\":\"d6e3d4f7-c8a5-44f3-90ab-2a4aa63ff52b\",\"dns_zone_id\":\"5c3c343b50ab38c5d4b73001\",\"errors\":[],\"managed\":true,\"value\":\"example.netlify.com\"},{\"hostname\":\"example.com\",\"type\":\"NETLIFYv6\",\"ttl\":3600,\"priority\":null,\"weight\":null,\"port\":null,\"flag\":null,\"tag\":null,\"id\":\"5c3c3e42ccd232f0f0298fbb\",\"site_id\":\"d6e3d4f7-c8a5-44f3-90ab-2a4aa63ff52b\",\"dns_zone_id\":\"5c3c343b50ab38c5d4b73001\",\"errors\":[],\"managed\":true,\"value\":\"example.netlify.com\"}]";
 
         let _m = mock("GET", "/")
+            .match_query(Matcher::Regex("access_token.+$".into()))
             .with_status(200)
             .with_header("content-type", "application/json; charset=utf-8")
             .with_header("content-length", &body.len().to_string())
