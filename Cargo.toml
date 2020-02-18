@@ -34,16 +34,16 @@ maintenance = { status = "passively-maintained" }
 
 [dependencies]
 failure = "0.1.6"
-futures = "0.3.2"
+futures = "0.3.4"
 log = "0.4.8"
 pretty_env_logger = "0.4.0"
 serde = { version = "1.0.104", features = ["derive"] }
-serde_json = "1.0.46"
+serde_json = "1.0.48"
 structopt = "0.3.9"
-ureq = { version = "0.11.3", features = ["tls"] }
+ureq = { version = "0.11.4", features = ["tls"] }
 
 [dev-dependencies]
-mockito = "0.23.0"
+mockito = "0.23.1"
 
 [profile.release]
 debug = false
