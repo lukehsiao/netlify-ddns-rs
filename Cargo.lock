@@ -22,7 +22,7 @@ version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "extend 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -388,7 +388,7 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "mockito 0.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "ureq 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -617,15 +617,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "serde"
-version = "1.0.105"
+version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "serde_derive 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.105"
+version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -640,7 +640,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "itoa 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "ryu 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -688,8 +688,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 1.0.16 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -701,8 +701,8 @@ dependencies = [
  "base-x 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "proc-macro2 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)",
  "sha1 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 1.0.16 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1083,8 +1083,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum sct 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e3042af939fca8c3453b7af0f1c66e533a15a86169e39de2657310ade8f98d3c"
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
-"checksum serde 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)" = "e707fbbf255b8fc8c3b99abb91e7257a622caeb20a9818cbadbeeede4e0932ff"
-"checksum serde_derive 1.0.105 (registry+https://github.com/rust-lang/crates.io-index)" = "ac5d00fc561ba2724df6758a17de23df5914f20e41cb00f94d5b7ae42fffaff8"
+"checksum serde 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)" = "36df6ac6412072f67cf767ebbde4133a5b2e88e76dc6187fa7104cd16f783399"
+"checksum serde_derive 1.0.106 (registry+https://github.com/rust-lang/crates.io-index)" = "9e549e3abf4fb8621bd1609f11dfc9f5e50320802273b12f3811a67e6716ea6c"
 "checksum serde_json 1.0.50 (registry+https://github.com/rust-lang/crates.io-index)" = "78a7a12c167809363ec3bd7329fc0a3369056996de43c4b37ef3cd54a6ce4867"
 "checksum sha1 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2579985fda508104f7587689507983eadd6a6e84dd35d6d115361f530916fa0d"
 "checksum slab 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
