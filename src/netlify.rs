@@ -1,7 +1,7 @@
 use failure::{bail, Error};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DNSRecord {
     pub hostname: String,
     #[serde(rename = "type")]
