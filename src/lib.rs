@@ -220,7 +220,6 @@ mod test {
                 id: Some("abc123".to_string()),
                 value: "9.9.9.9".to_string(),
             },
-
             // Glob subdomain, exact and non-exact
             DNSRecord {
                 hostname: "*.sub.helloworld.com".to_string(),
@@ -236,7 +235,6 @@ mod test {
                 id: Some("abc123".to_string()),
                 value: "9.9.9.9".to_string(),
             },
-            
             // Empty subdomain, exact and non-exact
             DNSRecord {
                 hostname: "helloworld.com".to_string(),
