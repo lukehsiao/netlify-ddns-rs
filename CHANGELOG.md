@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2020-05-01
+### Added
+- [@ksmithbaylor][ksb]: Extend conflict detection to handle subdomain globs.
+
 ## [0.2.3] - 2020-02-04
 ### Added
 - [@lukehsiao][lh]: Expose ttl setting as command line argument.
@@ -37,8 +41,10 @@ Initial release on GitHub and crates.io.
 
 
 [lh]: https://github.com/lukehsiao
+[ksb]: https://github.com/ksmithbaylor
 
-[Unreleased]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.3...master
+[Unreleased]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.4...master
+[0.2.4]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.0...v0.2.1

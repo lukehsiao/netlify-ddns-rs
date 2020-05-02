@@ -381,7 +381,7 @@ dependencies = [
 
 [[package]]
 name = "netlify-ddns"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "failure 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
