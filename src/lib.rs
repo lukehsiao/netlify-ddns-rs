@@ -107,6 +107,27 @@ async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
     Ok(ip)
 }
 
+fn get_conflicts(
+    dns_records: Vec<DNSRecord>,
+    args: &Args,
+    rec: &DNSRecord,
+) -> (Vec<DNSRecord>, Vec<DNSRecord>) {
+    let target_hostname = format!(
+        "{}{}{}",
+        &args.subdomain,
+        if &args.subdomain == "" { "" } else { "." },
+        &args.domain
+    );
+    dns_records
+        .into_iter()
+        .filter(|r| match args.ip_type {
+            IpType::IPV4 => r.dns_type == "A",
+            IpType::IPV6 => r.dns_type == "AAAA",
+        })
+        .filter(|r| r.hostname == target_hostname)
+        .partition(|r| r.hostname == target_hostname && r.value == rec.value)
+}
+
 pub fn run(args: Args) -> Result<(), Error> {
     let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
@@ -125,18 +146,7 @@ pub fn run(args: Args) -> Result<(), Error> {
     let dns_records = netlify::get_dns_records(&args.domain, &args.token)?;
 
     // Match on subdomain
-    // TODO: what if subdomain == ""?
-    let (exact, conflicts): (Vec<DNSRecord>, Vec<DNSRecord>) = dns_records
-        .into_iter()
-        .filter(|r| match args.ip_type {
-            IpType::IPV4 => r.dns_type == "A",
-            IpType::IPV6 => r.dns_type == "AAAA",
-        })
-        .filter(|r| {
-            let v = r.hostname.split('.').collect::<Vec<&str>>();
-            v.len() == 3 && v[0] == args.subdomain
-        })
-        .partition(|r| r.hostname == rec.hostname && r.value == rec.value);
+    let (exact, conflicts) = get_conflicts(dns_records, &args, &rec);
 
     // Clear existing records for this subdomain, if any
     for r in conflicts {
@@ -190,5 +200,116 @@ mod test {
         if let Ok(_) = executor::block_on(get_external_ip(&IpType::IPV6)) {
             panic!("Should've gotten an error.");
         }
+    }
+
+    #[test]
+    fn test_conflicts() {
+        let dns_records = vec![
+            // Basic subdomain, exact and non-exact
+            DNSRecord {
+                hostname: "sub.helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "1.2.3.4".to_string(),
+            },
+            DNSRecord {
+                hostname: "sub.helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "9.9.9.9".to_string(),
+            },
+            // Glob subdomain, exact and non-exact
+            DNSRecord {
+                hostname: "*.sub.helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "1.2.3.4".to_string(),
+            },
+            DNSRecord {
+                hostname: "*.sub.helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "9.9.9.9".to_string(),
+            },
+            // Empty subdomain, exact and non-exact
+            DNSRecord {
+                hostname: "helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "1.2.3.4".to_string(),
+            },
+            DNSRecord {
+                hostname: "helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: Some("abc123".to_string()),
+                value: "9.9.9.9".to_string(),
+            },
+        ];
+
+        let (glob_exact, glob_conflicts) = get_conflicts(
+            dns_records.clone(),
+            &Args {
+                domain: "helloworld.com".to_string(),
+                subdomain: "*.sub".to_string(),
+                ttl: 3600,
+                ip_type: IpType::IPV4,
+                token: "123".to_string(),
+            },
+            &DNSRecord {
+                hostname: "*.sub".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: None,
+                value: "1.2.3.4".to_string(),
+            },
+        );
+        assert_eq!(glob_conflicts.len(), 1);
+        assert_eq!(glob_exact.len(), 1);
+
+        let (sub_exact, sub_conflicts) = get_conflicts(
+            dns_records.clone(),
+            &Args {
+                domain: "helloworld.com".to_string(),
+                subdomain: "sub".to_string(),
+                ttl: 3600,
+                ip_type: IpType::IPV4,
+                token: "123".to_string(),
+            },
+            &DNSRecord {
+                hostname: "sub".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: None,
+                value: "1.2.3.4".to_string(),
+            },
+        );
+        assert_eq!(sub_conflicts.len(), 1);
+        assert_eq!(sub_exact.len(), 1);
+
+        let (empty_exact, empty_conflicts) = get_conflicts(
+            dns_records.clone(),
+            &Args {
+                domain: "helloworld.com".to_string(),
+                subdomain: "".to_string(),
+                ttl: 3600,
+                ip_type: IpType::IPV4,
+                token: "123".to_string(),
+            },
+            &DNSRecord {
+                hostname: "".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                id: None,
+                value: "1.2.3.4".to_string(),
+            },
+        );
+        assert_eq!(empty_conflicts.len(), 1);
+        assert_eq!(empty_exact.len(), 1);
     }
 }
