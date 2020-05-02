@@ -1,5 +1,16 @@
-use failure::{bail, Error};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum NetlifyError {
+    #[error("The domain {domain} could not be found on your account.")]
+    MissingDomain { domain: String },
+    #[error("Unauthorized credentials. Check your Netlify token.")]
+    Unauthorized,
+    #[error("Netlify Error {status}: {op}.")]
+    Unknown { op: String, status: u16 },
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DNSRecord {
@@ -12,7 +23,7 @@ pub struct DNSRecord {
 }
 
 /// Retrieve the DNS records for domain, authenticated with token.
-pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Error> {
+pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
@@ -30,16 +41,16 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>, Erro
         let dns_records: Vec<DNSRecord> = serde_json::from_str(&resp.into_string()?)?;
         Ok(dns_records)
     } else {
-        bail!(
-            "[{}] ({}): Unable to get DNS records.",
-            resp.status(),
-            resp.status_text()
-        );
+        Err(NetlifyError::Unknown {
+            op: "Unable to get DNS records.".to_string(),
+            status: resp.status(),
+        }
+        .into())
     }
 }
 
 /// Delete the DNS record.
-pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<(), Error> {
+pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<()> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records/{}",
@@ -54,17 +65,22 @@ pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result
 
     let response = ureq::delete(&url).query("access_token", token).call();
     match response.status() {
-        404 => bail!("The domain {} could not be found on your account.", domain),
-        401 => bail!("Unauthorized credentials. Check your Netlify token"),
-        200 | 204 => (),
-        status => bail!("Error {}: could not delete the dns record", status),
+        404 => Err(NetlifyError::MissingDomain {
+            domain: domain.to_string(),
+        }
+        .into()),
+        401 => Err(NetlifyError::Unauthorized.into()),
+        200 | 204 => Ok(()),
+        status => Err(NetlifyError::Unknown {
+            op: "could not delete dns record".to_string(),
+            status,
+        }
+        .into()),
     }
-
-    Ok(())
 }
 
 /// Add a dns record to the domain.
-pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DNSRecord, Error> {
+pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DNSRecord> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
@@ -82,14 +98,19 @@ pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DN
         .build();
     let resp = req.send_string(&serde_json::to_string(&record)?);
 
-    let result: DNSRecord = match resp.status() {
-        201 => serde_json::from_str(&resp.into_string()?)?,
-        404 => bail!("The domain {} could not be found on your account.", domain),
-        401 => bail!("Unauthorized credentials. Check your Netlify token"),
-        status => bail!("Error {}: could not add the dns record", status),
-    };
-
-    Ok(result)
+    match resp.status() {
+        201 => Ok(serde_json::from_str(&resp.into_string()?)?),
+        404 => Err(NetlifyError::MissingDomain {
+            domain: domain.to_string(),
+        }
+        .into()),
+        401 => Err(NetlifyError::Unauthorized.into()),
+        status => Err(NetlifyError::Unknown {
+            op: "could not add the dns record".to_string(),
+            status,
+        }
+        .into()),
+    }
 }
 
 #[cfg(test)]

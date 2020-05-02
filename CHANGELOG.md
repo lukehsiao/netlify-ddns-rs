@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- [@lukehsiao][lh]: Switch from `failure` to `thiserror` and `anyhow`.
+
 ## [0.2.4] - 2020-05-01
 ### Added
 - [@ksmithbaylor][ksb]: Extend conflict detection to handle subdomain globs.

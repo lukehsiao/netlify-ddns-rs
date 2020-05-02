@@ -6,11 +6,12 @@ pub mod netlify;
 use futures::future::FutureExt;
 use futures::{executor, future};
 
-use failure::{bail, Error};
+use anyhow::{Context, Result};
 use log::{debug, info};
 use structopt::clap::arg_enum;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
+use thiserror::Error;
 
 use netlify::DNSRecord;
 
@@ -20,6 +21,14 @@ arg_enum! {
         IPV4,
         IPV6,
     }
+}
+
+#[derive(Error, Debug)]
+pub enum ExternalIPError {
+    #[error("Error {status}: Unable to get external IP from ident.me.")]
+    IDENTME { status: u16 },
+    #[error("Error {status}: Unable to get external IP from ipify.org.")]
+    IPIFY { status: u16 },
 }
 
 #[derive(Debug, StructOpt)]
@@ -50,7 +59,7 @@ pub struct Args {
     pub token: String,
 }
 
-async fn query_ident_me(ip_type: &IpType) -> Result<String, Error> {
+async fn query_ident_me(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
         IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
@@ -63,14 +72,19 @@ async fn query_ident_me(ip_type: &IpType) -> Result<String, Error> {
     };
 
     if resp.ok() {
-        let body = resp.into_string()?;
+        let body = resp
+            .into_string()
+            .context("Failed to convert ident.me response into string.")?;
         Ok(body)
     } else {
-        bail!("Unable to get external IP from ident.me.");
+        Err(ExternalIPError::IDENTME {
+            status: resp.status(),
+        }
+        .into())
     }
 }
 
-async fn query_ipify_org(ip_type: &IpType) -> Result<String, Error> {
+async fn query_ipify_org(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
         IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
@@ -83,16 +97,21 @@ async fn query_ipify_org(ip_type: &IpType) -> Result<String, Error> {
     };
 
     if resp.ok() {
-        let body = resp.into_string()?;
+        let body = resp
+            .into_string()
+            .context("Failed to convert ident.me response into string.")?;
         Ok(body)
     } else {
-        bail!("Unable to get external IP from ipify.org.");
+        Err(ExternalIPError::IPIFY {
+            status: resp.status(),
+        }
+        .into())
     }
 }
 
 // Get the host machine's external IP address by querying multiple services and
 // taking the first response.
-async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
+async fn get_external_ip(ip_type: &IpType) -> Result<String> {
     debug!("Querying third-party services for external IP...");
 
     let third_parties = vec![
@@ -101,7 +120,9 @@ async fn get_external_ip(ip_type: &IpType) -> Result<String, Error> {
     ];
 
     // Select the first succesful future, or the last failure.
-    let (ip, _) = future::select_ok(third_parties.into_iter()).await?;
+    let (ip, _) = future::select_ok(third_parties.into_iter())
+        .await
+        .context("All queries for external IP failed.")?;
 
     info!("Found External IP: {}", ip);
     Ok(ip)
@@ -128,7 +149,7 @@ fn get_conflicts(
         .partition(|r| r.hostname == target_hostname && r.value == rec.value)
 }
 
-pub fn run(args: Args) -> Result<(), Error> {
+pub fn run(args: Args) -> Result<()> {
     let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
     let rec = DNSRecord {
@@ -143,7 +164,8 @@ pub fn run(args: Args) -> Result<(), Error> {
     };
 
     // Update the DNS record if it exists, otherwise add.
-    let dns_records = netlify::get_dns_records(&args.domain, &args.token)?;
+    let dns_records = netlify::get_dns_records(&args.domain, &args.token)
+        .context("Unable to fetch DNS records.")?;
 
     // Match on subdomain
     let (exact, conflicts) = get_conflicts(dns_records, &args, &rec);
@@ -151,13 +173,15 @@ pub fn run(args: Args) -> Result<(), Error> {
     // Clear existing records for this subdomain, if any
     for r in conflicts {
         info!("Clearing conflicting DNS records for this subdomain.");
-        netlify::delete_dns_record(&args.domain, &args.token, r)?;
+        netlify::delete_dns_record(&args.domain, &args.token, r)
+            .context("Unable to delete DNS records.")?;
     }
 
     // Add new record
     if exact.is_empty() {
         info!("Adding the DNS record.");
-        let rec = netlify::add_dns_record(&args.domain, &args.token, rec)?;
+        let rec = netlify::add_dns_record(&args.domain, &args.token, rec)
+            .context("Unable to add the DNS record.")?;
         info!("{:#?}", rec);
     }
 
