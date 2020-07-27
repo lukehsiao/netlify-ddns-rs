@@ -48,3 +48,8 @@ mockito = "0.27.0"
 
 [profile.release]
 debug = false
+
+[package.metadata.release]
+pre-release-commit-message = "chore: version {{version}}"
+post-release-commit-message = "chore: bump development version to {{next_version}}"
+tag-message = "{{crate_name}} {{version}}"
