@@ -1,6 +1,6 @@
 # netlify-ddns
 
-[![Travis-CI](https://img.shields.io/travis/com/lukehsiao/netlify-ddns-rs)](https://travis-ci.com/lukehsiao/netlify-ddns-rs)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lukehsiao/netlify-ddns-rs/rust)](https://github.com/lukehsiao/netlify-ddns-rs/actions)
 [![Crates.io](https://img.shields.io/crates/v/netlify-ddns)](https://crates.io/crates/netlify-ddns)
 [![License](https://img.shields.io/crates/l/netlify-ddns)](https://github.com/lukehsiao/netlify-ddns-rs/blob/master/LICENSE-MIT)
 
