@@ -153,7 +153,7 @@ pub fn run(args: Args) -> Result<()> {
     let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
     let rec = DNSRecord {
-        hostname: format!("{}", &args.subdomain),
+        hostname: args.subdomain.to_string(),
         dns_type: match args.ip_type {
             IpType::IPV4 => "A".to_string(),
             IpType::IPV6 => "AAAA".to_string(),

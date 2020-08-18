@@ -2,7 +2,6 @@
 #![forbid(warnings)]
 
 use anyhow::Result;
-use pretty_env_logger;
 use structopt::StructOpt;
 
 use netlify_ddns::{run, Args};
