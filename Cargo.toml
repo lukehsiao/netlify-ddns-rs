@@ -44,7 +44,7 @@ thiserror = "1.0.21"
 ureq = { version = "1.5.1", features = ["tls"] }
 
 [dev-dependencies]
-mockito = "0.27.0"
+mockito = "0.28.0"
 
 [profile.release]
 debug = false
