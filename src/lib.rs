@@ -50,7 +50,7 @@ pub struct Args {
     #[structopt(long, default_value = "3600")]
     pub ttl: u32,
 
-    /// Whether an IPv6 'AAAA' record should be updated
+    /// Whether an IPv6 "AAAA" or an IPv4 "A" record should be updated
     #[structopt(short, long, possible_values = &IpType::variants(), case_insensitive = true, default_value = "ipv4")]
     pub ip_type: IpType,
 
