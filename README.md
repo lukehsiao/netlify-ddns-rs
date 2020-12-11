@@ -6,8 +6,8 @@
 
 netlify-ddns is a simple command line tool for creating a DNS record for
 [Netlify's Managed DNS][netlify] service. It is meant to be run as a cron job
-and queries a third-party for your public IP, then updates or adds a DNS record
-using the Netlify API.
+and queries third-parties (multiple, in case one is down) for your public IP,
+then updates or adds a DNS record using the Netlify API.
 
 ## Installation
 
@@ -39,12 +39,24 @@ OPTIONS:
         --ttl <ttl>                The TTL value in seconds to set with the record [default: 3600]
 ```
 
+## Example Cronjob
+
+You could set a cronjob to update the `dev.example.com` hourly with a task like
+the following.
+
+```
+0 * * * * netlify-ddns -d example.com -s dev --token=<your token>
+```
+
 ## Related
 
-Check out [oscartbeaumont/netlify-dynamic-dns][netlify-ddns-go] for a similar
-client written in [Go][go].
+* [oscartbeaumont/netlify-dynamic-dns] for a similar client written in [Go][go].
+* [lytedev/netlify-ddns] for a simple shell script version.
+* [skylerwlewis/netlify-ddns.sh] for another simple script version.
 
 [cargo]: https://doc.rust-lang.org/cargo/getting-started/installation.html
 [go]: https://golang.org/
-[netlify-ddns-go]: https://github.com/oscartbeaumont/netlify-dynamic-dns
+[lytedev/netlify-ddns]: https://github.com/lytedev/netlify-ddns
 [netlify]: https://www.netlify.com/docs/dns/
+[oscartbeaumont/netlify-dynamic-dns]: https://github.com/oscartbeaumont/netlify-dynamic-dns
+[skylerwlewis/netlify-ddns.sh]: https://gist.github.com/skylerwlewis/ba052db5fe26424255674931d43fc030
