@@ -11,8 +11,6 @@ categories = ["command-line-utilities"]
 keywords = ["dynamic", "ddns", "dns", "netlify", "networking"]
 
 [badges]
-travis-ci = { repository = "lukehsiao/netlify-ddns-rs", branch = "master" }
-
 # Maintenance: `status` is required. Available options are:
 # - `actively-developed`: New features are being added and bugs are being fixed.
 # - `passively-maintained`: There are no plans for new features, but the maintainer intends to
