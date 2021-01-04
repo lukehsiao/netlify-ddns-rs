@@ -35,18 +35,26 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>> {
         mockito::server_url()
     };
 
-    let resp = ureq::get(&url).query("access_token", token).call();
-
-    if resp.ok() {
-        let dns_records: Vec<DNSRecord> = serde_json::from_str(&resp.into_string()?)?;
-        Ok(dns_records)
-    } else {
-        Err(NetlifyError::Unknown {
-            op: "Unable to get DNS records.".to_string(),
-            status: resp.status(),
+    let resp = match ureq::get(&url).query("access_token", token).call() {
+        Ok(r) => r,
+        Err(ureq::Error::Status(code, _)) => {
+            return Err(NetlifyError::Unknown {
+                op: "Unable to get DNS records.".to_string(),
+                status: code,
+            }
+            .into())
         }
-        .into())
-    }
+        Err(_) => {
+            return Err(NetlifyError::Unknown {
+                op: "Unable to get DNS records.".to_string(),
+                status: 0,
+            }
+            .into())
+        }
+    };
+
+    let dns_records: Vec<DNSRecord> = serde_json::from_str(&resp.into_string()?)?;
+    Ok(dns_records)
 }
 
 /// Delete the DNS record.
@@ -63,17 +71,23 @@ pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result
         mockito::server_url()
     };
 
-    let response = ureq::delete(&url).query("access_token", token).call();
-    match response.status() {
-        404 => Err(NetlifyError::MissingDomain {
-            domain: domain.to_string(),
-        }
-        .into()),
-        401 => Err(NetlifyError::Unauthorized.into()),
-        200 | 204 => Ok(()),
-        status => Err(NetlifyError::Unknown {
+    match ureq::delete(&url).query("access_token", token).call() {
+        Ok(_) => Ok(()),
+        Err(ureq::Error::Status(code, _)) => match code {
+            404 => Err(NetlifyError::MissingDomain {
+                domain: domain.to_string(),
+            }
+            .into()),
+            401 => Err(NetlifyError::Unauthorized.into()),
+            status => Err(NetlifyError::Unknown {
+                op: "could not delete dns record".to_string(),
+                status,
+            }
+            .into()),
+        },
+        Err(_) => Err(NetlifyError::Unknown {
             op: "could not delete dns record".to_string(),
-            status,
+            status: 0,
         }
         .into()),
     }
@@ -92,22 +106,28 @@ pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DN
         mockito::server_url()
     };
 
-    let mut req = ureq::post(&url)
+    let req = ureq::post(&url)
         .query("access_token", token)
-        .set("Content-Type", "application/json")
-        .build();
-    let resp = req.send_string(&serde_json::to_string(&record)?);
+        .set("Content-Type", "application/json");
 
-    match resp.status() {
-        201 => Ok(serde_json::from_str(&resp.into_string()?)?),
-        404 => Err(NetlifyError::MissingDomain {
-            domain: domain.to_string(),
-        }
-        .into()),
-        401 => Err(NetlifyError::Unauthorized.into()),
-        status => Err(NetlifyError::Unknown {
+    match req.send_string(&serde_json::to_string(&record)?) {
+        Ok(r) => Ok(serde_json::from_str(&r.into_string()?)?),
+        Err(ureq::Error::Status(code, r)) => match code {
+            201 => Ok(serde_json::from_str(&r.into_string()?)?),
+            404 => Err(NetlifyError::MissingDomain {
+                domain: domain.to_string(),
+            }
+            .into()),
+            401 => Err(NetlifyError::Unauthorized.into()),
+            status => Err(NetlifyError::Unknown {
+                op: "could not add the dns record".to_string(),
+                status,
+            }
+            .into()),
+        },
+        Err(_) => Err(NetlifyError::Unknown {
             op: "could not add the dns record".to_string(),
-            status,
+            status: 0,
         }
         .into()),
     }

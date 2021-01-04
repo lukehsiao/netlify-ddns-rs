@@ -11,7 +11,6 @@ use log::{debug, info};
 use structopt::clap::arg_enum;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
-use thiserror::Error;
 
 use netlify::DNSRecord;
 
@@ -21,14 +20,6 @@ arg_enum! {
         IPV4,
         IPV6,
     }
-}
-
-#[derive(Error, Debug)]
-pub enum ExternalIPError {
-    #[error("Error {status}: Unable to get external IP from ident.me.")]
-    IDENTME { status: u16 },
-    #[error("Error {status}: Unable to get external IP from ipify.org.")]
-    IPIFY { status: u16 },
 }
 
 #[derive(Debug, StructOpt)]
@@ -62,51 +53,37 @@ pub struct Args {
 async fn query_ident_me(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
-        IpType::IPV6 => ureq::get(&mockito::server_url()).call(),
+        IpType::IPV4 => ureq::get(&mockito::server_url()).call()?,
+        IpType::IPV6 => ureq::get(&mockito::server_url()).call()?,
     };
     #[cfg(not(test))]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get("https://v4.ident.me/").call(),
-        IpType::IPV6 => ureq::get("https://v6.ident.me/").call(),
+        IpType::IPV4 => ureq::get("https://v4.ident.me/").call()?,
+        IpType::IPV6 => ureq::get("https://v6.ident.me/").call()?,
     };
 
-    if resp.ok() {
-        let body = resp
-            .into_string()
-            .context("Failed to convert ident.me response into string.")?;
-        Ok(body)
-    } else {
-        Err(ExternalIPError::IDENTME {
-            status: resp.status(),
-        }
-        .into())
-    }
+    let body = resp
+        .into_string()
+        .context("Failed to convert ident.me response into string.")?;
+    Ok(body)
 }
 
 async fn query_ipify_org(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get(&mockito::server_url()).call(),
-        IpType::IPV6 => ureq::get(&mockito::server_url()).call(),
+        IpType::IPV4 => ureq::get(&mockito::server_url()).call()?,
+        IpType::IPV6 => ureq::get(&mockito::server_url()).call()?,
     };
     #[cfg(not(test))]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get("https://api.ipify.org/").call(),
-        IpType::IPV6 => ureq::get("https://api6.ipify.org/").call(),
+        IpType::IPV4 => ureq::get("https://api.ipify.org/").call()?,
+        IpType::IPV6 => ureq::get("https://api6.ipify.org/").call()?,
     };
 
-    if resp.ok() {
-        let body = resp
-            .into_string()
-            .context("Failed to convert ident.me response into string.")?;
-        Ok(body)
-    } else {
-        Err(ExternalIPError::IPIFY {
-            status: resp.status(),
-        }
-        .into())
-    }
+    let body = resp
+        .into_string()
+        .context("Failed to convert ident.me response into string.")?;
+    Ok(body)
 }
 
 // Get the host machine's external IP address by querying multiple services and
