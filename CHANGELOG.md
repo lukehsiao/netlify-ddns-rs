@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2021-01-04
 ### Removed
 - [@lukehsiao][lh]: Removed the ExternalIPError type.
 
@@ -49,7 +50,8 @@ Initial release on GitHub and crates.io.
 [lh]: https://github.com/lukehsiao
 [ksb]: https://github.com/ksmithbaylor
 
-[Unreleased]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.4...master
+[Unreleased]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.3.0...master
+[0.3.0]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.2.1...v0.2.2
