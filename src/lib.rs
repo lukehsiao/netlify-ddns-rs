@@ -113,7 +113,7 @@ fn get_conflicts(
     let target_hostname = format!(
         "{}{}{}",
         &args.subdomain,
-        if &args.subdomain == "" { "" } else { "." },
+        if args.subdomain.is_empty() { "" } else { "." },
         &args.domain
     );
     dns_records
