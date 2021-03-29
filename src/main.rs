@@ -1,6 +1,3 @@
-#![forbid(unsafe_code)]
-#![forbid(warnings)]
-
 use anyhow::Result;
 use structopt::StructOpt;
 

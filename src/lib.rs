@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-#![forbid(warnings)]
+#![deny(warnings)]
 
 pub mod netlify;
 
@@ -12,13 +12,13 @@ use structopt::clap::arg_enum;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
-use netlify::DNSRecord;
+use netlify::DnsRecord;
 
 arg_enum! {
     #[derive(Debug)]
     pub enum IpType {
-        IPV4,
-        IPV6,
+        Ipv4,
+        Ipv6,
     }
 }
 
@@ -53,13 +53,13 @@ pub struct Args {
 async fn query_ident_me(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get(&mockito::server_url()).call()?,
-        IpType::IPV6 => ureq::get(&mockito::server_url()).call()?,
+        IpType::Ipv4 => ureq::get(&mockito::server_url()).call()?,
+        IpType::Ipv6 => ureq::get(&mockito::server_url()).call()?,
     };
     #[cfg(not(test))]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get("https://v4.ident.me/").call()?,
-        IpType::IPV6 => ureq::get("https://v6.ident.me/").call()?,
+        IpType::Ipv4 => ureq::get("https://v4.ident.me/").call()?,
+        IpType::Ipv6 => ureq::get("https://v6.ident.me/").call()?,
     };
 
     let body = resp
@@ -71,13 +71,13 @@ async fn query_ident_me(ip_type: &IpType) -> Result<String> {
 async fn query_ipify_org(ip_type: &IpType) -> Result<String> {
     #[cfg(test)]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get(&mockito::server_url()).call()?,
-        IpType::IPV6 => ureq::get(&mockito::server_url()).call()?,
+        IpType::Ipv4 => ureq::get(&mockito::server_url()).call()?,
+        IpType::Ipv6 => ureq::get(&mockito::server_url()).call()?,
     };
     #[cfg(not(test))]
     let resp = match ip_type {
-        IpType::IPV4 => ureq::get("https://api.ipify.org/").call()?,
-        IpType::IPV6 => ureq::get("https://api6.ipify.org/").call()?,
+        IpType::Ipv4 => ureq::get("https://api.ipify.org/").call()?,
+        IpType::Ipv6 => ureq::get("https://api6.ipify.org/").call()?,
     };
 
     let body = resp
@@ -106,10 +106,10 @@ async fn get_external_ip(ip_type: &IpType) -> Result<String> {
 }
 
 fn get_conflicts(
-    dns_records: Vec<DNSRecord>,
+    dns_records: Vec<DnsRecord>,
     args: &Args,
-    rec: &DNSRecord,
-) -> (Vec<DNSRecord>, Vec<DNSRecord>) {
+    rec: &DnsRecord,
+) -> (Vec<DnsRecord>, Vec<DnsRecord>) {
     let target_hostname = format!(
         "{}{}{}",
         &args.subdomain,
@@ -119,8 +119,8 @@ fn get_conflicts(
     dns_records
         .into_iter()
         .filter(|r| match args.ip_type {
-            IpType::IPV4 => r.dns_type == "A",
-            IpType::IPV6 => r.dns_type == "AAAA",
+            IpType::Ipv4 => r.dns_type == "A",
+            IpType::Ipv6 => r.dns_type == "AAAA",
         })
         .filter(|r| r.hostname == target_hostname)
         .partition(|r| r.hostname == target_hostname && r.value == rec.value)
@@ -129,11 +129,11 @@ fn get_conflicts(
 pub fn run(args: Args) -> Result<()> {
     let ip = executor::block_on(get_external_ip(&args.ip_type))?;
 
-    let rec = DNSRecord {
+    let rec = DnsRecord {
         hostname: args.subdomain.to_string(),
         dns_type: match args.ip_type {
-            IpType::IPV4 => "A".to_string(),
-            IpType::IPV6 => "AAAA".to_string(),
+            IpType::Ipv4 => "A".to_string(),
+            IpType::Ipv6 => "AAAA".to_string(),
         },
         ttl: Some(args.ttl),
         value: ip,
@@ -177,7 +177,7 @@ mod test {
             .with_header("content-type", "text/plain")
             .with_body("104.132.34.103")
             .create();
-        let ip = executor::block_on(get_external_ip(&IpType::IPV4)).unwrap();
+        let ip = executor::block_on(get_external_ip(&IpType::Ipv4)).unwrap();
         assert_eq!("104.132.34.103", &ip);
 
         let _m = mock("GET", "/")
@@ -186,7 +186,7 @@ mod test {
             .with_body("2620:0:1003:fd00:95e9:369a:53cd:f035")
             .create();
 
-        let ip = executor::block_on(get_external_ip(&IpType::IPV6)).unwrap();
+        let ip = executor::block_on(get_external_ip(&IpType::Ipv6)).unwrap();
         assert_eq!("2620:0:1003:fd00:95e9:369a:53cd:f035", &ip);
     }
 
@@ -198,7 +198,7 @@ mod test {
             .with_body("Not found")
             .create();
 
-        if let Ok(_) = executor::block_on(get_external_ip(&IpType::IPV6)) {
+        if let Ok(_) = executor::block_on(get_external_ip(&IpType::Ipv6)) {
             panic!("Should've gotten an error.");
         }
     }
@@ -207,14 +207,14 @@ mod test {
     fn test_conflicts() {
         let dns_records = vec![
             // Basic subdomain, exact and non-exact
-            DNSRecord {
+            DnsRecord {
                 hostname: "sub.helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
                 id: Some("abc123".to_string()),
                 value: "1.2.3.4".to_string(),
             },
-            DNSRecord {
+            DnsRecord {
                 hostname: "sub.helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
@@ -222,14 +222,14 @@ mod test {
                 value: "9.9.9.9".to_string(),
             },
             // Glob subdomain, exact and non-exact
-            DNSRecord {
+            DnsRecord {
                 hostname: "*.sub.helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
                 id: Some("abc123".to_string()),
                 value: "1.2.3.4".to_string(),
             },
-            DNSRecord {
+            DnsRecord {
                 hostname: "*.sub.helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
@@ -237,14 +237,14 @@ mod test {
                 value: "9.9.9.9".to_string(),
             },
             // Empty subdomain, exact and non-exact
-            DNSRecord {
+            DnsRecord {
                 hostname: "helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
                 id: Some("abc123".to_string()),
                 value: "1.2.3.4".to_string(),
             },
-            DNSRecord {
+            DnsRecord {
                 hostname: "helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
@@ -259,10 +259,10 @@ mod test {
                 domain: "helloworld.com".to_string(),
                 subdomain: "*.sub".to_string(),
                 ttl: 3600,
-                ip_type: IpType::IPV4,
+                ip_type: IpType::Ipv4,
                 token: "123".to_string(),
             },
-            &DNSRecord {
+            &DnsRecord {
                 hostname: "*.sub".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
@@ -279,10 +279,10 @@ mod test {
                 domain: "helloworld.com".to_string(),
                 subdomain: "sub".to_string(),
                 ttl: 3600,
-                ip_type: IpType::IPV4,
+                ip_type: IpType::Ipv4,
                 token: "123".to_string(),
             },
-            &DNSRecord {
+            &DnsRecord {
                 hostname: "sub".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
@@ -299,10 +299,10 @@ mod test {
                 domain: "helloworld.com".to_string(),
                 subdomain: "".to_string(),
                 ttl: 3600,
-                ip_type: IpType::IPV4,
+                ip_type: IpType::Ipv4,
                 token: "123".to_string(),
             },
-            &DNSRecord {
+            &DnsRecord {
                 hostname: "".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),

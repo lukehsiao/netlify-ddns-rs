@@ -13,7 +13,7 @@ pub enum NetlifyError {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct DNSRecord {
+pub struct DnsRecord {
     pub hostname: String,
     #[serde(rename = "type")]
     pub dns_type: String,
@@ -23,7 +23,7 @@ pub struct DNSRecord {
 }
 
 /// Retrieve the DNS records for domain, authenticated with token.
-pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>> {
+pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DnsRecord>> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
@@ -53,12 +53,12 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DNSRecord>> {
         }
     };
 
-    let dns_records: Vec<DNSRecord> = serde_json::from_str(&resp.into_string()?)?;
+    let dns_records: Vec<DnsRecord> = serde_json::from_str(&resp.into_string()?)?;
     Ok(dns_records)
 }
 
 /// Delete the DNS record.
-pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<()> {
+pub fn delete_dns_record(domain: &str, token: &str, record: DnsRecord) -> Result<()> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records/{}",
@@ -94,7 +94,7 @@ pub fn delete_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result
 }
 
 /// Add a dns record to the domain.
-pub fn add_dns_record(domain: &str, token: &str, record: DNSRecord) -> Result<DNSRecord> {
+pub fn add_dns_record(domain: &str, token: &str, record: DnsRecord) -> Result<DnsRecord> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
@@ -164,7 +164,7 @@ mod test {
         assert!(delete_dns_record(
             "example.com",
             "token",
-            DNSRecord {
+            DnsRecord {
                 hostname: String::from(""),
                 dns_type: String::from(""),
                 ttl: None,
@@ -182,7 +182,7 @@ mod test {
         assert!(delete_dns_record(
             "example.com",
             "token",
-            DNSRecord {
+            DnsRecord {
                 hostname: String::from(""),
                 dns_type: String::from(""),
                 ttl: None,
@@ -209,7 +209,7 @@ mod test {
         let resp = add_dns_record(
             "example.com",
             "token",
-            DNSRecord {
+            DnsRecord {
                 hostname: String::from(""),
                 dns_type: String::from(""),
                 ttl: None,

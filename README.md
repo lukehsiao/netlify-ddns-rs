@@ -33,7 +33,7 @@ FLAGS:
 OPTIONS:
     -d, --domain <domain>          The full domain for the DNS record
     -i, --ip-type <ip-type>        Whether an IPv6 'AAAA' record should be updated [default: ipv4]  [possible
-                                   values: IPV4, IPV6]
+                                   values: ipv4, ipv6]
     -s, --subdomain <subdomain>    The subdomain segment for the DNS record [default: www]
     -t, --token <token>            Your Netlify personal access token [env: NETLIFY_TOKEN=]
         --ttl <ttl>                The TTL value in seconds to set with the record [default: 3600]
