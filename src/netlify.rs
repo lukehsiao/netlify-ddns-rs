@@ -27,7 +27,7 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DnsRecord>> {
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
-        domain.replace(".", "_"),
+        domain.replace('.', "_"),
     );
     #[cfg(test)]
     let url = {
@@ -62,7 +62,7 @@ pub fn delete_dns_record(domain: &str, token: &str, record: DnsRecord) -> Result
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records/{}",
-        domain.replace(".", "_"),
+        domain.replace('.', "_"),
         record.id.expect("Record did not have an ID."),
     );
     #[cfg(test)]
@@ -98,7 +98,7 @@ pub fn add_dns_record(domain: &str, token: &str, record: DnsRecord) -> Result<Dn
     #[cfg(not(test))]
     let url = format!(
         "https://api.netlify.com/api/v1/dns_zones/{}/dns_records",
-        domain.replace(".", "_"),
+        domain.replace('.', "_"),
     );
     #[cfg(test)]
     let url = {
