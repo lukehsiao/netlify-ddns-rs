@@ -7,46 +7,49 @@ use futures::future::FutureExt;
 use futures::{executor, future};
 
 use anyhow::{Context, Result};
+use clap::AppSettings;
 use log::{debug, info};
-use structopt::clap::arg_enum;
-use structopt::clap::AppSettings;
-use structopt::StructOpt;
 
 use netlify::DnsRecord;
 
-arg_enum! {
-    #[derive(Debug)]
-    pub enum IpType {
-        Ipv4,
-        Ipv6,
-    }
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum IpType {
+    Ipv4,
+    Ipv6,
 }
 
-#[derive(Debug, StructOpt)]
-#[structopt(
+#[derive(Debug, clap::Parser)]
+#[clap(
+    version,
     about,
     setting(AppSettings::ColoredHelp),
     setting(AppSettings::ColorAuto)
 )]
 pub struct Args {
     /// The full domain for the DNS record
-    #[structopt(short, long)]
+    #[clap(short, long)]
     pub domain: String,
 
     /// The subdomain segment for the DNS record
-    #[structopt(short, long, default_value = "www")]
+    #[clap(short, long, default_value = "www")]
     pub subdomain: String,
 
     /// The TTL value in seconds to set with the record
-    #[structopt(long, default_value = "3600")]
+    #[clap(long, default_value = "3600")]
     pub ttl: u32,
 
     /// Whether an IPv6 "AAAA" or an IPv4 "A" record should be updated
-    #[structopt(short, long, possible_values = &IpType::variants(), case_insensitive = true, default_value = "ipv4")]
+    #[clap(
+        short,
+        long,
+        value_enum,
+        case_insensitive = true,
+        default_value = "ipv4"
+    )]
     pub ip_type: IpType,
 
     /// Your Netlify personal access token
-    #[structopt(short, long, env = "NETLIFY_TOKEN")]
+    #[clap(short, long, env = "NETLIFY_TOKEN")]
     pub token: String,
 }
 
