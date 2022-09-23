@@ -24,19 +24,17 @@ netlify-ddns
 A simple CLI tool for setting Netlify DNS records dynamically.
 
 USAGE:
-    netlify-ddns [OPTIONS] --domain <domain> --token <token>
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    netlify-ddns [OPTIONS] --domain <DOMAIN> --token <TOKEN>
 
 OPTIONS:
-    -d, --domain <domain>          The full domain for the DNS record
-    -i, --ip-type <ip-type>        Whether an IPv6 'AAAA' record should be updated [default: ipv4]  [possible
-                                   values: ipv4, ipv6]
-    -s, --subdomain <subdomain>    The subdomain segment for the DNS record [default: www]
-    -t, --token <token>            Your Netlify personal access token [env: NETLIFY_TOKEN=]
-        --ttl <ttl>                The TTL value in seconds to set with the record [default: 3600]
+    -d, --domain <DOMAIN>          The full domain for the DNS record
+    -h, --help                     Print help information
+    -i, --ip-type <IP_TYPE>        Whether an IPv6 "AAAA" or an IPv4 "A" record should be updated
+                                   [default: ipv4] [possible values: ipv4, ipv6]
+    -s, --subdomain <SUBDOMAIN>    The subdomain segment for the DNS record [default: www]
+    -t, --token <TOKEN>            Your Netlify personal access token [env: NETLIFY_TOKEN=]
+        --ttl <TTL>                The TTL value in seconds to set with the record [default: 3600]
+    -V, --version                  Print version information
 ```
 
 ## Example Cronjob
