@@ -30,7 +30,7 @@ See the commits here: [{{ version | trim_start_matches(pat="v") }}]
     {% if version -%}
         [{{ version | trim_start_matches(pat="v") }}]: https://github.com/lukehsiao/netlify-ddns/compare/{{ previous.version }}...{{ version }}
     {% else -%}
-        [Unreleased]: https://github.com/lukehsiao/netlify-ddns/compare/{{ previous.version }}...main
+        [Unreleased]: https://github.com/lukehsiao/netlify-ddns-rs/compare/{{ previous.version }}...main
     {% endif -%}
 {% endif %}
 

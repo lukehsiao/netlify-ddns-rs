@@ -73,7 +73,7 @@
 
 See the commits here: [0.3.1]
 
-[0.3.1]: https://github.com/lukehsiao/netlify-ddns/compare/v0.3.0...v0.3.1
+[0.3.1]: https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.3.0...v0.3.1
 
 ## [0.3.0] - 2021-01-04
 ### Removed
