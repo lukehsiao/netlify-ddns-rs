@@ -7,7 +7,6 @@ use futures::future::FutureExt;
 use futures::{executor, future};
 
 use anyhow::{Context, Result};
-use clap::AppSettings;
 use log::{debug, info};
 
 use netlify::DnsRecord;
@@ -19,37 +18,31 @@ pub enum IpType {
 }
 
 #[derive(Debug, clap::Parser)]
-#[clap(
+#[command(
+    author,
     version,
     about,
-    setting(AppSettings::ColoredHelp),
-    setting(AppSettings::ColorAuto)
+    long_about = None
 )]
 pub struct Args {
     /// The full domain for the DNS record
-    #[clap(short, long)]
+    #[arg(short, long)]
     pub domain: String,
 
     /// The subdomain segment for the DNS record
-    #[clap(short, long, default_value = "www")]
+    #[arg(short, long, default_value = "www")]
     pub subdomain: String,
 
     /// The TTL value in seconds to set with the record
-    #[clap(long, default_value = "3600")]
+    #[arg(long, default_value = "3600")]
     pub ttl: u32,
 
     /// Whether an IPv6 "AAAA" or an IPv4 "A" record should be updated
-    #[clap(
-        short,
-        long,
-        value_enum,
-        case_insensitive = true,
-        default_value = "ipv4"
-    )]
+    #[arg(short, long, value_enum, ignore_case = true, default_value = "ipv4")]
     pub ip_type: IpType,
 
     /// Your Netlify personal access token
-    #[clap(short, long, env = "NETLIFY_TOKEN")]
+    #[arg(short, long, env = "NETLIFY_TOKEN")]
     pub token: String,
 }
 
