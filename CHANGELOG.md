@@ -1,3 +1,31 @@
+## 0.3.2 - 2022-11-02
+
+### Bug Fixes
+- Include TTL in computing conflicts
+
+### Build and Dependencies
+- (deps) Bump thiserror from 1.0.35 to 1.0.36
+- (deps) Upgrade to clap v4
+- (deps) Bump thiserror from 1.0.36 to 1.0.37
+- (deps) Bump serde_json from 1.0.85 to 1.0.86
+- (deps) Bump clap from 4.0.8 to 4.0.11
+- (deps) Bump clap from 4.0.11 to 4.0.15
+- (deps) Bump clap from 4.0.15 to 4.0.18
+- (deps) Bump serde_json from 1.0.86 to 1.0.87
+
+### Documentation
+- (README) Add passively-maintained badge
+- (CHANGELOG) Fix all commits urls
+- (README) Link to maintenance status definitions
+
+### Miscellaneous Tasks
+- Add .mailmap for better git shortlogs
+
+See the commits here: [0.3.2]
+
+[0.3.2]: https://github.com/lukehsiao/netlify-ddns/compare/v0.3.1...v0.3.2
+
+
 ## 0.3.1 - 2022-09-23
 
 ### Build and Dependencies
