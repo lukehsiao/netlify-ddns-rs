@@ -29,8 +29,8 @@ pub struct Args {
     #[arg(short, long)]
     pub domain: String,
 
-    /// The subdomain segment for the DNS record
     #[arg(short, long, default_value = "www")]
+    /// The subdomain segment for the DNS record
     pub subdomain: String,
 
     /// The TTL value in seconds to set with the record
@@ -119,7 +119,7 @@ fn get_conflicts(
             IpType::Ipv6 => r.dns_type == "AAAA",
         })
         .filter(|r| r.hostname == target_hostname)
-        .partition(|r| r.hostname == target_hostname && r.value == rec.value)
+        .partition(|r| r.hostname == target_hostname && r.value == rec.value && r.ttl == rec.ttl)
 }
 
 pub fn run(args: Args) -> Result<()> {
@@ -207,8 +207,8 @@ mod test {
                 hostname: "sub.helloworld.com".to_string(),
                 dns_type: "A".to_string(),
                 ttl: Some(3600),
-                id: Some("abc123".to_string()),
                 value: "1.2.3.4".to_string(),
+                id: Some("abc123".to_string()),
             },
             DnsRecord {
                 hostname: "sub.helloworld.com".to_string(),
@@ -308,5 +308,32 @@ mod test {
         );
         assert_eq!(empty_conflicts.len(), 1);
         assert_eq!(empty_exact.len(), 1);
+
+        // Test that TTL is also included in the computation
+        let (glob_exact, glob_conflicts) = get_conflicts(
+            vec![DnsRecord {
+                hostname: "sub.helloworld.com".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(3600),
+                value: "1.2.3.4".to_string(),
+                id: Some("abc123".to_string()),
+            }],
+            &Args {
+                domain: "helloworld.com".to_string(),
+                subdomain: "sub".to_string(),
+                ttl: 10,
+                ip_type: IpType::Ipv4,
+                token: "123".to_string(),
+            },
+            &DnsRecord {
+                hostname: "sub".to_string(),
+                dns_type: "A".to_string(),
+                ttl: Some(10),
+                id: None,
+                value: "1.2.3.4".to_string(),
+            },
+        );
+        assert_eq!(glob_conflicts.len(), 1);
+        assert_eq!(glob_exact.len(), 0);
     }
 }
