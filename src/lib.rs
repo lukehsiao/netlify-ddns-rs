@@ -7,7 +7,7 @@ use futures::future::FutureExt;
 use futures::{executor, future};
 
 use anyhow::{Context, Result};
-use log::{debug, info};
+use tracing::{debug, info};
 
 use netlify::DnsRecord;
 
