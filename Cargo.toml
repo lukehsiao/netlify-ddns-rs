@@ -22,7 +22,7 @@ tracing-subscriber = { version = "0.3.16", features = ["env-filter", "fmt", "jso
 ureq = { version = "2.0.2", features = ["tls"] }
 
 [dev-dependencies]
-mockito = "0.31.0"
+mockito = "0.31.1"
 
 [profile.release]
 debug = false
