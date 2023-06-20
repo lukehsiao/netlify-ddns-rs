@@ -1,3 +1,23 @@
+## 0.3.3 - 2023-06-20
+
+### CI/CD
+- Update workflows for best practice
+
+### Documentation
+- (README) Update badges
+
+### Miscellaneous Tasks
+- Relicense to `BlueOak-1.0.0`
+- (contrib) Bump lockfile version before commit
+
+### Refactor
+- Switch from log to tracing
+
+See the commits here: [0.3.3]
+
+[0.3.3]: https://github.com/lukehsiao/netlify-ddns/compare/v0.3.2...v0.3.3
+
+
 ## 0.3.2 - 2022-11-02
 
 ### Bug Fixes
