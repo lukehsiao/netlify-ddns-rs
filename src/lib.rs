@@ -194,7 +194,7 @@ mod test {
             .with_body("Not found")
             .create();
 
-        if let Ok(_) = executor::block_on(get_external_ip(&IpType::Ipv6)) {
+        if executor::block_on(get_external_ip(&IpType::Ipv6)).is_ok() {
             panic!("Should've gotten an error.");
         }
     }
@@ -290,7 +290,7 @@ mod test {
         assert_eq!(sub_exact.len(), 1);
 
         let (empty_exact, empty_conflicts) = get_conflicts(
-            dns_records.clone(),
+            dns_records,
             &Args {
                 domain: "helloworld.com".to_string(),
                 subdomain: "".to_string(),

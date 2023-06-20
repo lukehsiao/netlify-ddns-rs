@@ -147,7 +147,7 @@ mod test {
             .with_status(200)
             .with_header("content-type", "application/json; charset=utf-8")
             .with_header("content-length", &body.len().to_string())
-            .with_body(&body)
+            .with_body(body)
             .create();
 
         let dns_records = get_dns_records("example.com", "token").unwrap();
@@ -203,7 +203,7 @@ mod test {
             .with_status(201)
             .with_header("content-type", "application/json; charset=utf-8")
             .with_header("content-length", &body.len().to_string())
-            .with_body(&body)
+            .with_body(body)
             .create();
 
         let resp = add_dns_record(
