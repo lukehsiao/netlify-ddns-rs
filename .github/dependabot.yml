@@ -1,27 +1,10 @@
 version: 2
 updates:
-# Maintain dependencies for GitHub Actions
-- package-ecosystem: "github-actions"
-  directory: "/"
-  schedule:
-    interval: "daily"
-
-- package-ecosystem: cargo
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "13:00"
-  open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: ureq
-    versions:
-    - 2.1.0
-  - dependency-name: anyhow
-    versions:
-    - 1.0.40
-  - dependency-name: serde
-    versions:
-    - 1.0.125
-  - dependency-name: futures
-    versions:
-    - 0.3.13
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "daily"
+    - package-ecosystem: "cargo"
+      directory: "/"
+      schedule:
+          interval: "daily"
