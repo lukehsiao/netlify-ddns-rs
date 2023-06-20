@@ -1,6 +1,6 @@
 # netlify-ddns
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lukehsiao/netlify-ddns-rs/rust)](https://github.com/lukehsiao/netlify-ddns-rs/actions)
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lukehsiao/netlify-ddns-rs/rust.yml)](https://github.com/lukehsiao/netlify-ddns-rs/actions/workflows/rust.yml)
 [![Crates.io](https://img.shields.io/crates/v/netlify-ddns)](https://crates.io/crates/netlify-ddns)
 [![License](https://img.shields.io/crates/l/netlify-ddns)](https://github.com/lukehsiao/netlify-ddns-rs/blob/main/LICENSE)
 ![maintenance](https://img.shields.io/maintenance/yes/2023?color=purple)
