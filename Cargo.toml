@@ -6,7 +6,7 @@ edition = "2021"
 description = "A simple CLI tool for setting Netlify DNS records dynamically."
 repository = "https://github.com/lukehsiao/netlify-ddns-rs"
 readme = "README.md"
-license = "Apache-2.0 OR MIT"
+license = "BlueOak-1.0.0"
 categories = ["command-line-utilities"]
 keywords = ["dynamic", "ddns", "dns", "netlify", "networking"]
 
