@@ -14,4 +14,5 @@ git commit CHANGELOG.md -m "docs(CHANGELOG): add entry for $2"
 
 # Update version
 cargo set-version ${2:1}
-git commit Cargo.toml -m "chore(release): bump version to $2"
+cargo build --release
+git commit Cargo.toml Cargo.lock -m "chore(release): bump version to $2"
