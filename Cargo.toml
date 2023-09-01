@@ -11,7 +11,7 @@ categories = ["command-line-utilities"]
 keywords = ["dynamic", "ddns", "dns", "netlify", "networking"]
 
 [dependencies]
-anyhow = "1.0.72"
+anyhow = "1.0.75"
 clap = { version = "4.4.2", features = ["derive", "env"] }
 futures = "0.3.28"
 serde = { version = "1.0.188", features = ["derive"] }
