@@ -1,14 +1,25 @@
-# netlify-ddns
+<h1 align="center">
+    :globe_with_meridians:<br>
+    netlify-ddns
+</h1>
+<div align="center">
+    <strong>A CLI tool for setting Netlify DNS records dynamically.</strong>
+</div>
+<br>
+<div align="center">
+  <a href="https://github.com/lukehsiao/netlify-ddns-rs/actions/workflows/rust.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/lukehsiao/netlify-ddns-rs/rust.yml" alt="Build Status"></a>
+  <a href="https://crates.io/crates/netlify-ddns">
+    <img src="https://img.shields.io/crates/v/netlify-ddns" alt="Version">
+  </a>
+  <a href="https://github.com/lukehsiao/netlify-ddns-rs/blob/main/LICENSE">
+    <img src="https://img.shields.io/crates/l/netlify-ddns" alt="License">
+  </a>
+</div>
+<br>
 
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/lukehsiao/netlify-ddns-rs/rust.yml)](https://github.com/lukehsiao/netlify-ddns-rs/actions/workflows/rust.yml)
-[![Crates.io](https://img.shields.io/crates/v/netlify-ddns)](https://crates.io/crates/netlify-ddns)
-[![License](https://img.shields.io/crates/l/netlify-ddns)](https://github.com/lukehsiao/netlify-ddns-rs/blob/main/LICENSE)
-![maintenance](https://img.shields.io/maintenance/yes/2023?color=purple)
-
-netlify-ddns is a simple command line tool for creating a DNS record for
-[Netlify's Managed DNS][netlify] service. It is meant to be run as a cron job
-and queries third-parties (multiple, in case one is down) for your public IP,
-then updates or adds a DNS record using the Netlify API.
+`netlify-ddns` is a simple command line tool for creating a DNS record for [Netlify's Managed DNS][netlify] service.
+It is meant to be run as a cron job and queries third-parties (multiple, in case one is down) for your public IP, then updates or adds a DNS record using the Netlify API.
 
 ## Installation
 
@@ -49,6 +60,7 @@ the following.
 * [oscartbeaumont/netlify-dynamic-dns] for a similar client written in [Go][go].
 * [lytedev/netlify-ddns] for a simple shell script version.
 * [skylerwlewis/netlify-ddns.sh] for another simple script version.
+* [johnsmol/netlify-ddns] for version written in Python.
 
 [cargo]: https://doc.rust-lang.org/cargo/getting-started/installation.html
 [go]: https://golang.org/
@@ -56,3 +68,4 @@ the following.
 [netlify]: https://www.netlify.com/docs/dns/
 [oscartbeaumont/netlify-dynamic-dns]: https://github.com/oscartbeaumont/netlify-dynamic-dns
 [skylerwlewis/netlify-ddns.sh]: https://gist.github.com/skylerwlewis/ba052db5fe26424255674931d43fc030
+[johnsmol/netlify-ddns]: https://github.com/johnsmol/netlify-ddns
