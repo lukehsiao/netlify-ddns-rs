@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 ---
-## [unreleased]
+## [0.3.4](https://github.com/lukehsiao/netlify-ddns-rs/compare/v0.3.3..v0.3.4) - 2024-01-19
 
 ### Documentation
 
@@ -184,4 +184,3 @@ All notable changes to this project will be documented in this file. See [conven
 ### Testing
 
 - **(lib)** add mockito http mocks for get_external_ip - ([2957502](https://github.com/lukehsiao/netlify-ddns-rs/commit/2957502f6547ebc37a3cc5a534e81cc3b1a7e514)) - Luke Hsiao
-
