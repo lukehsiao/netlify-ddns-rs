@@ -8,7 +8,8 @@
 <br>
 <div align="center">
   <a href="https://github.com/lukehsiao/netlify-ddns-rs/actions/workflows/rust.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/lukehsiao/netlify-ddns-rs/rust.yml" alt="Build Status"></a>
+    <img src="https://img.shields.io/github/actions/workflow/status/lukehsiao/netlify-ddns-rs/rust.yml" alt="Build Status">
+  </a>
   <a href="https://crates.io/crates/netlify-ddns">
     <img src="https://img.shields.io/crates/v/netlify-ddns" alt="Version">
   </a>
@@ -48,8 +49,7 @@ Options:
 
 ## Example Cronjob
 
-You could set a cronjob to update the `dev.example.com` hourly with a task like
-the following.
+You could set a cronjob to update the `dev.example.com` hourly with a task like the following.
 
 ```
 0 * * * * netlify-ddns -d example.com -s dev --token=<your token>
