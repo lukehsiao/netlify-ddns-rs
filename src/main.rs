@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use tracing_subscriber::EnvFilter;
 
-use netlify_ddns::{run, Args};
+use netlify_ddns::{Args, run};
 
 fn main() -> Result<()> {
     // Initialize the tracing-based logs

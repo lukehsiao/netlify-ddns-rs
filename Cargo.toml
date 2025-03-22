@@ -2,7 +2,7 @@
 name = "netlify-ddns"
 version = "0.3.4"
 authors = ["Luke Hsiao <luke@hsiao.dev>"]
-edition = "2021"
+edition = "2024"
 description = "A simple CLI tool for setting Netlify DNS records dynamically."
 repository = "https://github.com/lukehsiao/netlify-ddns-rs"
 readme = "README.md"

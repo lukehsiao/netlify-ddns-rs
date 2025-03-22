@@ -42,14 +42,14 @@ pub fn get_dns_records(domain: &str, token: &str) -> Result<Vec<DnsRecord>> {
                 op: "Unable to get DNS records.".to_string(),
                 status: code,
             }
-            .into())
+            .into());
         }
         Err(_) => {
             return Err(NetlifyError::Unknown {
                 op: "Unable to get DNS records.".to_string(),
                 status: 0,
             }
-            .into())
+            .into());
         }
     };
 
@@ -136,7 +136,7 @@ pub fn add_dns_record(domain: &str, token: &str, record: DnsRecord) -> Result<Dn
 #[cfg(test)]
 mod test {
     use super::*;
-    use mockito::{mock, Matcher};
+    use mockito::{Matcher, mock};
 
     #[test]
     fn test_get_dns_records() {
@@ -161,36 +161,40 @@ mod test {
             .with_status(200)
             .create();
 
-        assert!(delete_dns_record(
-            "example.com",
-            "token",
-            DnsRecord {
-                hostname: String::from(""),
-                dns_type: String::from(""),
-                ttl: None,
-                id: Some(String::from("example")),
-                value: String::from("example"),
-            }
-        )
-        .is_ok());
+        assert!(
+            delete_dns_record(
+                "example.com",
+                "token",
+                DnsRecord {
+                    hostname: String::from(""),
+                    dns_type: String::from(""),
+                    ttl: None,
+                    id: Some(String::from("example")),
+                    value: String::from("example"),
+                }
+            )
+            .is_ok()
+        );
 
         let _m = mock("DELETE", "/")
             .match_query(Matcher::Regex("access_token.+$".into()))
             .with_status(404)
             .create();
 
-        assert!(delete_dns_record(
-            "example.com",
-            "token",
-            DnsRecord {
-                hostname: String::from(""),
-                dns_type: String::from(""),
-                ttl: None,
-                id: Some(String::from("example")),
-                value: String::from("example"),
-            }
-        )
-        .is_err());
+        assert!(
+            delete_dns_record(
+                "example.com",
+                "token",
+                DnsRecord {
+                    hostname: String::from(""),
+                    dns_type: String::from(""),
+                    ttl: None,
+                    id: Some(String::from("example")),
+                    value: String::from("example"),
+                }
+            )
+            .is_err()
+        );
     }
 
     #[test]
