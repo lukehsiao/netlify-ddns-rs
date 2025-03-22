@@ -19,9 +19,9 @@ semver:
 link-check:
 	-lychee -E '**/*.md'
 
-# Runs nextest
-test:
-	cargo nextest run
+# format source
+fmt:
+	cargo fmt
 
 # Sets up a watcher that lints, tests, and builds
 watch:
