@@ -4,26 +4,32 @@ _default:
 	@just --list
 
 # Runs clippy on the sources
+[group('dev')]
 check:
 	cargo clippy --locked -- -D warnings
 
 # check security advisories
+[group('dev')]
 audit:
 	cargo deny check advisories
 
 # check for semver violations
+[group('dev')]
 semver:
 	cargo semver-checks check-release
 
 # Check links in markdown files
+[group('dev')]
 link-check:
 	-lychee -E '**/*.md'
 
 # format source
+[group('dev')]
 fmt:
 	cargo fmt
 
 # Sets up a watcher that lints, tests, and builds
+[group('dev')]
 watch:
 	bacon
 
@@ -61,6 +67,7 @@ _tlog describe version:
 	@git stats -r {{describe}}..HEAD
 
 # Target can be ["major", "minor", "patch", or a version]
+[group('release')]
 release target: semver
 	#!/usr/bin/env python3
 	# Inspired-by: https://git.sr.ht/~sircmpwn/dotfiles/tree/master/bin/semver
@@ -122,5 +129,6 @@ release target: semver
 	    print(new_version)
 
 # Publish a new version on crates.io
+[group('release')]
 publish:
 	cargo publish
