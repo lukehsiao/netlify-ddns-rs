@@ -19,6 +19,12 @@
 </div>
 <br>
 
+> [!IMPORTANT]
+> I no longer personally use Netlify, and consequently no longer have interest in maintaining this repository.
+> Consequently, I am archiving it to make that clear.
+> I am happy to transfer this to a new maintainer.
+> If anyone is interested please reach out.
+
 `netlify-ddns` is a simple command line tool for creating a DNS record for [Netlify's Managed DNS][netlify] service.
 It is meant to be run as a cron job and queries third-parties (multiple, in case one is down) for your public IP, then updates or adds a DNS record using the Netlify API.
 
